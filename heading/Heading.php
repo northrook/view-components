@@ -15,10 +15,10 @@ final class Heading extends AbstractComponent
     public string $tag = 'h1';
 
     //
-    // protected function parseArguments( array &$arguments ) : void
-    // {
-    //     dump( $arguments );
-    // }
+    protected function parseArguments( array &$arguments ) : void
+    {
+        dump( $arguments );
+    }
     //
     // protected function compile( TemplateCompiler $compiler ) : string
     // {

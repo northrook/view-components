@@ -69,7 +69,12 @@ final class Toast extends AbstractComponent
     protected function prepareArguments( array &$arguments ) : void
     {
         $dateTime = $arguments['instances'][0] ?? $arguments['timestamp'] ?? 'now';
-        \assert( \is_string( $dateTime ) );
+
+        \assert(
+            \is_string( $dateTime ) || \is_int( $dateTime ),
+            'Expected string|int, '.\gettype( $dateTime ).' given',
+        );
+
         $timestamp = new Time( $dateTime );
 
         $this->timestamp = $timestamp->unixTimestamp;
@@ -101,7 +106,7 @@ final class Toast extends AbstractComponent
             $this->icon,
             ['height' => $height, 'width' => $width],
         );
-        return $icon?->getHtml( true ) ?? '';
+        return (string) $icon;
     }
 
     protected function render() : string

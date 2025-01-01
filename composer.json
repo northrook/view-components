@@ -12,14 +12,15 @@
   "autoload": {
     "psr-4": {
       "Core\\View\\Component\\": [
-        "components/accordion",
-        "components/anchor",
-        "components/code",
-        "components/combobox",
-        "components/heading",
-        "components/icon",
-        "components/input",
-        "components/toast"
+        "accordion",
+        "anchor",
+        "button",
+        "code",
+        "combobox",
+        "heading",
+        "icon",
+        "input",
+        "toast"
       ]
     }
   },
