@@ -1,0 +1,42 @@
+{
+  "name": "northrook/view-components",
+  "description": "A collection of View Components for northrook\\view.",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Martin",
+      "email": "mn@northrook.com"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "Core\\View\\Component\\": [
+        "components/accordion",
+        "components/anchor",
+        "components/code",
+        "components/combobox",
+        "components/heading",
+        "components/icon",
+        "components/input",
+        "components/toast"
+      ]
+    }
+  },
+  "scripts": {
+    "phpstan": "@php vendor/bin/phpstan analyse"
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "require": {
+    "php": ">=8.3",
+    "northrook/pathfinder": "dev-main",
+    "northrook/core-symfony": "dev-main",
+    "northrook/view": "dev-main",
+    "northrook/view-icons": "dev-main"
+  },
+  "require-dev": {
+    "phpstan/phpstan": "@stable",
+    "northrook/dev-env": "dev-main"
+  }
+}
