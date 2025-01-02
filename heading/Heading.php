@@ -5,28 +5,43 @@ declare(strict_types=1);
 namespace Core\View\Component;
 
 use Core\View\Attribute\ViewComponent;
-use Core\View\Html\Tag;
+use Stringable;
+use Core\View\Html\{Attributes, Tag};
 
 #[ViewComponent( Tag::HEADING, true, 128 )]
 final class Heading extends AbstractComponent
 {
-    public string $get;
+    use InnerContent;
 
-    public string $tag = 'h1';
+    public Tag $tag;
 
-    //
-    protected function parseArguments( array &$arguments ) : void
+    public function __construct()
     {
-        dump( $arguments );
+        $this->tag = Tag::from( 'h1' );
     }
-    //
-    // protected function compile( TemplateCompiler $compiler ) : string
-    // {
-    //     return $compiler->render( __DIR__.'/heading.latte', $this, cache : false );
-    // }
 
     protected function render() : string
     {
+        dump( $this );
+
         return '<heading>This will be a heading</heading>';
     }
+
+    // /**
+    //  * @param 'h1'|'h2'|'h3'|'h4'|'h5'|'h6'|'hgroup'                              $tag
+    //  * @param string                                                              $heading
+    //  * @param ?string                                                             $subheading
+    //  * @param array<string, null|array<array-key, string>|bool|string>|Attributes $attributes
+    //  * @param string|Stringable[]                                                 $content
+    //  *
+    //  * @return string
+    //  */
+    // public static function view(
+    //     string           $tag,
+    //     string           $heading,
+    //     ?string          $subheading = null,
+    //     array|Attributes $attributes = [],
+    // ) : string {
+    //     return '<i'.Attributes::from( $attributes ).'>'.(string) $svg.'</i>';
+    // }
 }
