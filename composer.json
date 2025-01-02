@@ -34,7 +34,8 @@
     "northrook/pathfinder": "dev-main",
     "northrook/core-symfony": "dev-main",
     "northrook/view": "dev-main",
-    "northrook/view-icons": "dev-main"
+    "northrook/view-icons": "dev-main",
+    "tempest/highlight": "@stable"
   },
   "require-dev": {
     "phpstan/phpstan": "@stable",

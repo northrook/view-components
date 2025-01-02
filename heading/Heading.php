@@ -5,9 +5,39 @@ declare(strict_types=1);
 namespace Core\View\Component;
 
 use Core\View\Attribute\ViewComponent;
-use Stringable;
-use Core\View\Html\{Attributes, Tag};
+use Core\View\Html\{Element, Tag};
 
+/**
+ * Headings
+ *
+ * Seems like there are several ways we could solve the sub-heading component.
+ *
+ * We need to test how screen headers handle each.
+ *
+ * ```
+ * // We could use <small>, <span>, or <sup> inside  the H tag.
+ * <h1>
+ *     This a heading
+ *     <small>With a sub-heading</small>
+ * </h1>
+ *
+ * // hGroup seems to be the official way in HTML5, but only permits H1-H6 and P.
+ * <hgroup>
+ *     <h1>This a heading</h1>
+ *     <p>With a sub-heading</p>
+ * </hgroup>
+ *
+ * // Lastly, we could use the <header> tag.
+ * <header>
+ *     <h1>This a heading</h1>
+ *     <span>With a sub-heading</span>
+ * </header>
+ * ```
+ *
+ * I'm personally leaning towards the regular <h1> tag.
+ * It may be worthwhile having an option to include the sub-heading in the
+ * heading or not, would need more validation.
+ */
 #[ViewComponent( Tag::HEADING, true, 128 )]
 final class Heading extends AbstractComponent
 {
@@ -22,26 +52,13 @@ final class Heading extends AbstractComponent
 
     protected function render() : string
     {
-        dump( $this );
+        $this->attributes->class->add( 'heading', true );
+        $view = new Element(
+            $this->tag,
+            $this->attributes,
+            ...$this->innerContent->getArray(),
+        );
 
-        return '<heading>This will be a heading</heading>';
+        return $view->render();
     }
-
-    // /**
-    //  * @param 'h1'|'h2'|'h3'|'h4'|'h5'|'h6'|'hgroup'                              $tag
-    //  * @param string                                                              $heading
-    //  * @param ?string                                                             $subheading
-    //  * @param array<string, null|array<array-key, string>|bool|string>|Attributes $attributes
-    //  * @param string|Stringable[]                                                 $content
-    //  *
-    //  * @return string
-    //  */
-    // public static function view(
-    //     string           $tag,
-    //     string           $heading,
-    //     ?string          $subheading = null,
-    //     array|Attributes $attributes = [],
-    // ) : string {
-    //     return '<i'.Attributes::from( $attributes ).'>'.(string) $svg.'</i>';
-    // }
 }
