@@ -5,21 +5,24 @@ declare(strict_types=1);
 namespace Core\View\Component;
 
 use Core\View\Attribute\ViewComponent;
+use Core\View\Template\ViewContent;
 use Core\View\Html\{Element, Tag};
 use Northrook\Logger\Log;
 use Support\Str;
 use Tempest\Highlight\Highlighter;
 
-#[ViewComponent( ['pre', 'code:{language}:block'], true, -256 )]
+#[ViewComponent( ['pre', 'code', 'pre:{language}', 'code:{language}:block'], true, -256 )]
 final class Code extends AbstractComponent
 {
     use InnerContent;
+
+    // protected readonly string $innerContent;
 
     protected bool $tidy = false;
 
     protected ?string $language = null;
 
-    private bool $block = false;
+    protected bool $block = false;
 
     private string $code;
 
@@ -30,11 +33,24 @@ final class Code extends AbstractComponent
         $this->tag = Tag::from( 'code' );
     }
 
+    // protected function assignInnerContent( array $fromArguments ) : void
+    // {
+    //     $this->innerContent = (string) ViewContent::fromAST( $fromArguments );
+    // }
+
     protected function render() : string
     {
+        if ( $this->tag->is( 'pre' ) ) {
+            $this->block = true;
+        }
+
         if ( ! $this->block || ! isset( $this->code ) ) {
             $this->inlineCode();
         }
+        if ( $this->block ) {
+            $this->block();
+        }
+
         if ( $this->tidy ) {
             $this->code = (string) Str::replaceEach(
                 [' ), );' => ' ) );'],
@@ -42,9 +58,12 @@ final class Code extends AbstractComponent
             );
         }
 
+        // dump( $this->code );
         if ( $this->language ) {
             $content = "{$this->highlight( $this->code )}";
             $lines   = \substr_count( $content, PHP_EOL );
+
+            // dump( $lines, $content );
             // $this->attributes( 'language', $this->language );
 
             // if ( $lines ) {
@@ -58,26 +77,28 @@ final class Code extends AbstractComponent
         $view = new Element(
             $this->tag,
             $this->attributes,
-            ...$this->innerContent->getArray(),
+            $content,
         );
 
+        // dump( $this, $content );
         return $view->render();
-    }
-
-    private function getCode() : string
-    {
-        return $this->code = $this->innerContent->getString();
     }
 
     protected function inlineCode() : void
     {
-        $this->code = (string) \preg_replace( '#\s+#', '', $this->getCode() );
+        $this->code = (string) \preg_replace( '#\s+#', ' ', (string) $this->innerContent );
     }
 
     protected function block() : void
     {
+        // dump( __METHOD__ . ' START' );
+
+        // dump( $this->innerContent );
+
         $leftPadding = [];
-        $lines       = \explode( "\n", $this->getCode() );
+        $lines       = \explode( "\n", (string) $this->innerContent );
+
+        // dump( $lines );
 
         foreach ( $lines as $line ) {
             $line = \str_replace( "\t", '    ', $line );
@@ -86,7 +107,8 @@ final class Code extends AbstractComponent
             }
         }
 
-        $trimSpaces = \min( $leftPadding );
+        $trimSpaces = $leftPadding ? \min( $leftPadding ) : 0;
+        // dump( $leftPadding, $trimSpaces );
 
         foreach ( $lines as $line => $string ) {
             if ( \str_starts_with( $string, \str_repeat( ' ', $trimSpaces ) ) ) {
@@ -99,14 +121,18 @@ final class Code extends AbstractComponent
             $lines[$line] = \str_replace( '    ', "\t", $string );
         }
 
+        // dump( $lines );
         $this->code = \implode( "\n", $lines );
+        // dump( $this->code );
         $this->tag->set( 'pre' );
         $this->attributes->class->add( 'block', true );
         $this->block = true;
+        // dump( __METHOD__ . ' END' );
     }
 
     final protected function highlight( string $code, ?int $gutter = null ) : string
     {
+        // dump( __METHOD__, $code, $gutter );
         if ( ! $this->language || ! $code ) {
             return '';
         }
