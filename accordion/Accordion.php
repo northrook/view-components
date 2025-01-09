@@ -9,6 +9,9 @@ use Core\View\Attribute\ViewComponent;
 use Core\View\Html\Element\{Heading, Span};
 use Support\Normalize;
 
+/**
+ * https://www.nngroup.com/articles/accordion-icons/
+ */
 #[ViewComponent( 'accordion', true, 128 )]
 final class Accordion extends AbstractComponent
 {
