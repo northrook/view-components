@@ -11,7 +11,7 @@ use Northrook\Logger\Log;
 use Core\View\Html\{Attributes};
 
 #[ViewComponent( 'icon:{icon}', true, 128 )]
-final class Icon extends AbstractComponent
+final class IconComponent extends AbstractComponent
 {
     protected ?string $icon;
 

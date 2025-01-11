@@ -12,7 +12,7 @@ use Support\Str;
 use Tempest\Highlight\Highlighter;
 
 #[ViewComponent( ['pre', 'code', 'pre:{language}', 'code:{language}:block'], true, -256 )]
-final class Code extends AbstractComponent
+final class CodeComponent extends AbstractComponent
 {
     use InnerContent;
 

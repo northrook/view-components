@@ -13,7 +13,7 @@ use Support\Normalize;
  * https://www.nngroup.com/articles/accordion-icons/
  */
 #[ViewComponent( 'accordion', true, 128 )]
-final class Accordion extends AbstractComponent
+final class AccordionComponent extends AbstractComponent
 {
     protected function render() : string
     {
@@ -24,7 +24,7 @@ final class Accordion extends AbstractComponent
     }
 
     /**
-     * @param Heading|Span|string                                                 $title
+     * @param HeadingComponent|Span|string                                        $title
      * @param Content|string                                                      $content
      * @param bool                                                                $open
      * @param null|string                                                         $icon

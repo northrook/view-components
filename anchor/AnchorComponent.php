@@ -14,7 +14,7 @@ use Core\View\Html\Element;
  * @link https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a MDN
  */
 // #[ViewComponent( tag : 'a', priority : 64 )]
-final class Anchor extends AbstractComponent
+final class AnchorComponent extends AbstractComponent
 {
     /**
      * @param ?string                 $set

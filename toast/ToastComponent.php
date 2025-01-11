@@ -36,7 +36,7 @@ use Support\Time;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 #[ViewComponent( 'toast:{status}' )]
-final class Toast extends AbstractComponent
+final class ToastComponent extends AbstractComponent
 {
     public string $id;
 
@@ -86,7 +86,7 @@ final class Toast extends AbstractComponent
     private function details() : string
     {
         if ( $this->description ) {
-            return Accordion::view(
+            return AccordionComponent::view(
                 'Details',
                 $this->description,
                 false,
