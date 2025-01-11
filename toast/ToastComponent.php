@@ -30,8 +30,10 @@ namespace Core\View\Component;
  */
 
 use Core\View\Attribute\ViewComponent;
+use Core\View\Html\Attributes;
 use Core\View\IconSet;
 use Core\View\Interface\IconProviderInterface;
+use Core\View\Template\ViewElement;
 use Support\Time;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
@@ -60,6 +62,11 @@ final class ToastComponent extends AbstractComponent
     public function __construct(
         #[Autowire( service : IconSet::class )] private readonly IconProviderInterface $iconProvider,
     ) {}
+
+    public function getView() : ViewElement
+    {
+        return $this::view( 'Hello there.' );
+    }
 
     /**
      * @param array{instances: string[], timestamp: ?int, status: ?string, icon: ?string } $arguments
@@ -92,22 +99,23 @@ final class ToastComponent extends AbstractComponent
                 false,
                 null, // $this->iconService->getIcon( 'chevron', [ 'class' => 'direction:right' ] ),
                 ['id' => "toast-{$this->id}"],
-            );
+            )->render();
         }
         return '';
     }
 
-    private function icon(
-        string  $height = '1rem',
-        ?string $width = null,
-    ) : string {
-        $width ??= $height;
-        $icon = $this->iconProvider->get(
+    private function icon() : string
+    {
+        return (string) $this->iconProvider->get(
             $this->icon,
-            ['height' => $height, 'width' => $width],
+            ['height' => '1rem', 'width' => '1rem'],
         );
-        return (string) $icon;
     }
+
+    // protected function render() : string
+    // {
+    //     return $this->getView()->render();
+    // }
 
     protected function render() : string
     {
@@ -136,5 +144,36 @@ final class ToastComponent extends AbstractComponent
                 {$this->details()}
             </toast>
             HTML;
+    }
+
+    /**
+     * @param string                                                              $message
+     * @param ?string                                                             $description
+     * @param string                                                              $id
+     * @param string                                                              $status
+     * @param ?int                                                                $timeout
+     * @param int                                                                 $timestamp
+     * @param array<string, null|array<array-key, string>|bool|string>|Attributes $attributes
+     * @param string                                                              $when
+     * @param string                                                              $icon
+     *
+     * @return ViewElement
+     */
+    public static function view(
+        string           $message,
+        ?string          $description = null,
+        ?string          $id = null, // generate from content hash
+        string           $status = 'notice',
+        ?int             $timeout = null,
+        ?int             $timestamp = null,
+        // string           $when,
+        // string           $icon,
+        array|Attributes $attributes = [],
+    ) : ViewElement {
+        $timestamp ??= \time();
+
+        $view = new ViewElement( 'toast', $attributes );
+
+        return $view;
     }
 }

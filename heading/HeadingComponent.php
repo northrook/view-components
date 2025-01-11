@@ -6,6 +6,7 @@ namespace Core\View\Component;
 
 use Core\View\Attribute\ViewComponent;
 use Core\View\Html\{Attributes, Element, HtmlNode, Tag};
+use Core\View\Template\ViewElement;
 
 /**
  * Headings
@@ -46,25 +47,31 @@ final class HeadingComponent extends AbstractComponent
 {
     use InnerContent;
 
-    public Tag $tag;
-
-    public function __construct()
-    {
-        $this->tag = Tag::from( 'h1' );
-    }
-
     protected function render() : string
     {
-        $this->attributes->class->add( 'heading', true );
-        $view = new Element(
-            $this->tag,
-            $this->attributes,
-            ...$this->innerContent->getArray(),
-        );
-
-        return $view->render();
+        return $this->getView()->render();
     }
 
+    public function getView() : ViewElement
+    {
+        $this->attributes->class->add( 'heading', true );
+
+        return $this::view(
+            $this->view->tag->getTagName(),
+            __METHOD__,
+        );
+    }
+
+    /**
+     * @param int|string                                                             $level
+     * @param string                                                                 $heading
+     * @param null|string                                                            $subheading
+     * @param bool                                                                   $subheadingBefore
+     * @param bool                                                                   $hGroup
+     * @param array<array-key, null|array<array-key, string>|bool|string>|Attributes $attributes
+     *
+     * @return ViewElement
+     */
     public static function view(
         string|int       $level,
         string           $heading,
@@ -72,7 +79,7 @@ final class HeadingComponent extends AbstractComponent
         bool             $subheadingBefore = false,
         bool             $hGroup = false,
         array|Attributes $attributes = [],
-    ) {
+    ) : ViewElement {
         $level = Element\Heading::validLevel( $level );
 
         $heading = new Element(
@@ -89,7 +96,7 @@ final class HeadingComponent extends AbstractComponent
             );
         }
 
-        $view = new Element(
+        $view = new ViewElement(
             $hGroup ? 'hgroup' : "h{$level}",
             $attributes,
             $heading,
@@ -102,6 +109,6 @@ final class HeadingComponent extends AbstractComponent
 
         $view->attributes->class->add( ['heading'], true );
 
-        return $view->render();
+        return $view;
     }
 }

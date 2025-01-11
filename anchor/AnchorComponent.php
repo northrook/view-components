@@ -9,6 +9,7 @@ namespace Core\View\Component;
 // The idea is to have each in-code anchor tag be editable from the back-end
 use Core\View\Attribute\ViewComponent;
 use Core\View\Html\Element;
+use Core\View\Template\ViewElement;
 
 /**
  * @link https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a MDN
@@ -63,5 +64,15 @@ final class AnchorComponent extends AbstractComponent
             $this->attributes,
             __METHOD__,
         );
+    }
+
+    public static function view() : ViewElement
+    {
+        return new ViewElement( 'a' );
+    }
+
+    public function getView() : ViewElement
+    {
+        return $this::view();
     }
 }

@@ -6,6 +6,7 @@ namespace Core\View\Component;
 
 use Core\View\Html\{Attributes, Content};
 use Core\View\Attribute\ViewComponent;
+use Core\View\Template\ViewElement;
 use Core\View\Html\Element\{Heading, Span};
 use Support\Normalize;
 
@@ -17,20 +18,17 @@ final class AccordionComponent extends AbstractComponent
 {
     protected function render() : string
     {
-        return $this::view(
-            'Accordion title',
-            'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-        );
+        return $this->getView()->render();
     }
 
     /**
-     * @param HeadingComponent|Span|string                                        $title
+     * @param Heading|Span|string                                                 $title
      * @param Content|string                                                      $content
      * @param bool                                                                $open
      * @param null|string                                                         $icon
      * @param array<string, null|array<array-key, string>|bool|string>|Attributes $attributes
      *
-     * @return string
+     * @return ViewElement
      */
     public static function view(
         string|Span|Heading $title,
@@ -38,8 +36,11 @@ final class AccordionComponent extends AbstractComponent
         bool                $open = false,
         ?string             $icon = null,
         array|Attributes    $attributes = [],
-    ) : string {
-        $attributes = Attributes::from( $attributes );
+    ) : ViewElement {
+        $view = new ViewElement(
+            tag        : 'accordion',
+            attributes : $attributes,
+        );
 
         if ( \is_string( $title ) ) {
             $title = new Span( [], $title );
@@ -53,22 +54,36 @@ final class AccordionComponent extends AbstractComponent
             $title->attributes->set( 'role', 'heading' );
         }
 
-        if ( ! $attributes->has( 'id' ) ) {
-            $attributes->set( 'id', Normalize::key( (string) $title->content.(string) $content ) );
+        if ( ! $view->attributes->has( 'id' ) ) {
+            $view->attributes->set( 'id', Normalize::key( (string) $title->content.(string) $content ) );
         }
 
         $state     = $open ? 'true' : 'false';
-        $ariaID    = \hash( algo : 'xxh3', data : 'accordion'.(string) $attributes->get( 'id' ) );
+        $ariaID    = \hash( algo : 'xxh3', data : 'accordion'.(string) $view->attributes->get( 'id' ) );
         $buttonID  = "{$ariaID}-button";
         $sectionID = "{$ariaID}-section";
 
-        $attributes->class->add( 'flex col' );
+        $view->attributes->class->add( 'flex col' );
 
-        return <<<HTML
-            <accordion{$attributes}>
-              <button id="{$buttonID}" aria-controls="{$sectionID}" aria-expanded="{$state}" class="pv-xs">{$icon}{$title}</button>
-              <section id="{$sectionID}" aria-labelledby="{$buttonID}">{$content}</section>
-            </accordion>
+        $button = <<<HTML
+            <button id="{$buttonID}" aria-controls="{$sectionID}" aria-expanded="{$state}" class="pv-xs">{$icon}{$title}</button>
             HTML;
+
+        $section = <<<HTML
+            <section id="{$sectionID}" aria-labelledby="{$buttonID}">{$content}</section>
+            HTML;
+
+        $view->content->set( 'button', $button );
+        $view->content->set( 'section', $section );
+
+        return $view;
+    }
+
+    public function getView() : ViewElement
+    {
+        return $this::view(
+            'Accordion title',
+            'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+        );
     }
 }

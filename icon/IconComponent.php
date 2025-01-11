@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace Core\View\Component;
 
 use Core\View\Attribute\ViewComponent;
+use Core\View\Html\Attributes;
 use Core\View\IconView;
 use Core\View\Interface\IconProviderInterface;
+use Core\View\Template\ViewElement;
 use Northrook\Logger\Log;
-use Core\View\Html\{Attributes};
 
 #[ViewComponent( 'icon:{icon}', true, 128 )]
 final class IconComponent extends AbstractComponent
@@ -19,15 +20,16 @@ final class IconComponent extends AbstractComponent
 
     protected function render() : string
     {
-        if ( ! $this->icon ) {
-            Log::error( $this::class.': No icon key provided.' );
-            return '';
-        }
+        return $this->getView()->render();
+    }
 
-        $icon = $this->iconProvider->get( $this->icon );
+    public function getView() : ViewElement
+    {
+        $icon = $this->iconProvider->get( $this->icon ?? '' );
 
         if ( ! $icon?->isValid ) {
-            return '';
+            Log::error( $this::class.': No icon key provided.' );
+            $icon = '';
         }
 
         return $this::view( $icon, $this->attributes );
@@ -37,12 +39,12 @@ final class IconComponent extends AbstractComponent
      * @param IconView|string                                                     $svg
      * @param array<string, null|array<array-key, string>|bool|string>|Attributes $attributes
      *
-     * @return string
+     * @return ViewElement
      */
     public static function view(
         string|IconView  $svg,
         array|Attributes $attributes = [],
-    ) : string {
-        return '<i'.Attributes::from( $attributes ).'>'.(string) $svg.'</i>';
+    ) : ViewElement {
+        return new ViewElement( 'i', $attributes, $svg );
     }
 }
