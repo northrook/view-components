@@ -36,11 +36,12 @@ final class CodeComponent extends AbstractComponent
 
     public function getView() : ViewElement
     {
-        $this->code = $this->view->content->getString();
+        $this->code = $this->innerContent->getString();
+        // dump( $this );
 
-        if ( ! $this->code ) {
-            throw new InvalidArgumentException( $this::class." was provided an empty 'code' property." );
-        }
+        // if ( !$this->code ) {
+        //     throw new InvalidArgumentException( $this::class . " was provided an empty 'code' property." );
+        // }
 
         if ( $this->view->tag->is( 'pre' ) ) {
             $this->block = true;
@@ -76,7 +77,7 @@ final class CodeComponent extends AbstractComponent
             $attributes,
         );
 
-        $code = $block ? self::block( $code ) : self::inline( $code );
+        $code = $block ? self::codeBlock( $code ) : self::codeInline( $code );
 
         if ( $tidy ) {
             $code = Str::replaceEach(
@@ -87,18 +88,26 @@ final class CodeComponent extends AbstractComponent
         }
 
         if ( false !== $language ) {
-            $code = self::highlight( $code, $language );
+            $code  = self::highlight( $code, $language );
+            $lines = \substr_count( $code, PHP_EOL );
+            if ( $lines ) {
+                $view->attributes->add( 'code-lines', $lines + 1 );
+            }
+            $view->attributes->add( 'code-language', $language );
         }
 
+        $view->content( $code );
+
+        dump( \get_defined_vars() );
         return $view;
     }
 
-    final protected static function inline( string|Stringable $code ) : string
+    final protected static function codeInline( string|Stringable $code ) : string
     {
         return (string) \preg_replace( '#\s+#', ' ', (string) $code );
     }
 
-    final protected static function block( string|Stringable $code ) : string
+    final protected static function codeBlock( string|Stringable $code ) : string
     {
         $leftPadding = [];
         $lines       = \explode( "\n", (string) $code );
@@ -140,6 +149,13 @@ final class CodeComponent extends AbstractComponent
             return '';
         }
 
+        if ( AUTO === $language ) {
+            $language = match ( true ) {
+                (bool) \preg_match( '#^\h*<[a-z-:]*.+>\s*$#m', $code, $matches ) => 'html',
+                default                                                          => $language,
+            };
+        }
+
         $language ??= new TextLanguage();
 
         $highlighter = self::highlighter();
@@ -157,36 +173,3 @@ final class CodeComponent extends AbstractComponent
         return self::$highlighter ??= new Highlighter();
     }
 }
-
-// protected function parseArguments( array &$arguments ) : void
-// {
-//     if ( 'pre' === $arguments['tag'] ) {
-//         $arguments[] = 'block';
-//     }
-//     $content = $arguments['content'] ?? [];
-//
-//     if ( ! \array_is_list( $content ) ) {
-//         $content = HtmlContent::toArray( $content );
-//     }
-//
-//     foreach ( $content as $index => $value ) {
-//         if ( \is_array( $value ) ) {
-//             // $value = HtmlContent::contentString( [$value]);
-//             // dump( [ $value ] );
-//             continue;
-//         }
-//
-//         if ( ! \is_string( $value ) ) {
-//             dump( __METHOD__.' encountered invalid content value.', $this, '---' );
-//
-//             continue;
-//         }
-//
-//         if ( ! \trim( $value ) ) {
-//             unset( $content[$index] );
-//         }
-//     }
-//     $code = \implode( '', $content );
-//
-//     unset( $arguments['content'] );
-// }
