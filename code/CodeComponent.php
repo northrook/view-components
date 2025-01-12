@@ -5,98 +5,103 @@ declare(strict_types=1);
 namespace Core\View\Component;
 
 use Core\View\Attribute\ViewComponent;
-use Core\View\Template\ViewContent;
-use Core\View\Html\{Element, Tag};
-use Northrook\Logger\Log;
+use Core\View\Html\Attributes;
+use Core\View\Template\ViewElement;
 use Support\Str;
-use Tempest\Highlight\Highlighter;
+use Tempest\Highlight\{Highlighter, Language, Languages\Text\TextLanguage};
+use const Support\AUTO;
+use Stringable;
+use InvalidArgumentException;
 
 #[ViewComponent( ['pre', 'code', 'pre:{language}', 'code:{language}:block'], true, -256 )]
 final class CodeComponent extends AbstractComponent
 {
-    use InnerContent;
-
-    // protected readonly string $innerContent;
+    private static ?Highlighter $highlighter;
 
     protected bool $tidy = false;
 
-    protected ?string $language = null;
+    protected null|string|false $language = null;
 
     protected bool $block = false;
 
-    private string $code;
+    protected ?int $gutter = null;
 
-    public Tag $tag;
+    private string $code;
 
     public function __construct()
     {
-        $this->tag = Tag::from( 'code' );
+        // Reset the Highlighter on instantiation
+        $this::$highlighter = null;
     }
 
-    // protected function assignInnerContent( array $fromArguments ) : void
-    // {
-    //     $this->innerContent = (string) ViewContent::fromAST( $fromArguments );
-    // }
-
-    protected function render() : string
+    public function getView() : ViewElement
     {
-        if ( $this->tag->is( 'pre' ) ) {
+        $this->code = $this->view->content->getString();
+
+        if ( ! $this->code ) {
+            throw new InvalidArgumentException( $this::class." was provided an empty 'code' property." );
+        }
+
+        if ( $this->view->tag->is( 'pre' ) ) {
             $this->block = true;
         }
 
-        if ( ! $this->block || ! isset( $this->code ) ) {
-            $this->inlineCode();
-        }
-        if ( $this->block ) {
-            $this->block();
-        }
+        return $this::view(
+            code       : $this->code,
+            block      : $this->block,
+            language   : $this->language,
+            tidy       : $this->tidy,
+            attributes : $this->view->attributes,
+        );
+    }
 
-        if ( $this->tidy ) {
-            $this->code = (string) Str::replaceEach(
-                [' ), );' => ' ) );'],
-                $this->code,
-            );
-        }
-
-        // dump( $this->code );
-        if ( $this->language ) {
-            $content = "{$this->highlight( $this->code )}";
-            $lines   = \substr_count( $content, PHP_EOL );
-
-            // dump( $lines, $content );
-            // $this->attributes( 'language', $this->language );
-
-            // if ( $lines ) {
-            //     $this->attributes( 'line-count', (string) $lines );
-            // }
-        }
-        else {
-            $content = $this->code;
-        }
-
-        $view = new Element(
-            $this->tag,
-            $this->attributes,
-            $content,
+    /**
+     * @param string                                                              $code
+     * @param bool                                                                $block      [false] Inline `<code>` by default
+     * @param null|false|Language|string                                          $language
+     * @param bool                                                                $tidy
+     * @param array<string, null|array<array-key, string>|bool|string>|Attributes $attributes
+     *
+     * @return ViewElement
+     */
+    public static function view(
+        string                     $code,
+        bool                       $block = false,
+        false|null|string|Language $language = AUTO,
+        bool                       $tidy = false,
+        array|Attributes           $attributes = [],
+    ) : ViewElement {
+        $view = new ViewElement(
+            $block ? 'pre' : 'code',
+            $attributes,
         );
 
-        // dump( $this, $content );
-        return $view->render();
+        $code = $block ? self::block( $code ) : self::inline( $code );
+
+        if ( $tidy ) {
+            $code = Str::replaceEach(
+                [' ), );' => ' ) );'],
+                $code,
+            );
+            /** @var string $code */
+        }
+
+        if ( false !== $language ) {
+            $code = self::highlight( $code, $language );
+        }
+
+        return $view;
     }
 
-    protected function inlineCode() : void
+    final protected static function inline( string|Stringable $code ) : string
     {
-        $this->code = (string) \preg_replace( '#\s+#', ' ', (string) $this->innerContent );
+        return (string) \preg_replace( '#\s+#', ' ', (string) $code );
     }
 
-    protected function block() : void
+    final protected static function block( string|Stringable $code ) : string
     {
-        // dump( __METHOD__ . ' START' );
-
-        // dump( $this->innerContent );
-
         $leftPadding = [];
-        $lines       = \explode( "\n", (string) $this->innerContent );
+        $lines       = \explode( "\n", (string) $code );
 
         // dump( $lines );
 
@@ -116,37 +121,40 @@ final class CodeComponent extends AbstractComponent
             }
 
             \preg_match( '#^(\s*)#m', $string, $matches );
-            $leftPad      = \strlen( $matches[0] ?? 0 );
-            $string       = \str_repeat( ' ', $leftPad ).\trim( $string );
+            $leftPad = \strlen( $matches[0] ?? '' );
+            $string  = \str_repeat( ' ', $leftPad ).\trim( $string );
+            // :: Handled by Str::normalize
             $lines[$line] = \str_replace( '    ', "\t", $string );
         }
 
-        // dump( $lines );
-        $this->code = \implode( "\n", $lines );
-        // dump( $this->code );
-        $this->tag->set( 'pre' );
-        $this->attributes->class->add( 'block', true );
-        $this->block = true;
-        // dump( __METHOD__ . ' END' );
+        return \implode( "\n", $lines );
     }
 
-    final protected function highlight( string $code, ?int $gutter = null ) : string
-    {
-        // dump( __METHOD__, $code, $gutter );
-        if ( ! $this->language || ! $code ) {
+    public static function highlight(
+        string               $code,
+        null|string|Language $language = AUTO,
+        ?int                 $gutter = null,
+    ) : string {
+        // Bail early
+        if ( ! $code ) {
             return '';
         }
 
-        if ( ! $this->block && $gutter ) {
-            Log::warning( 'Inline code snippets cannot have a gutter' );
-            $gutter = null;
+        $language ??= new TextLanguage();
+
+        $highlighter = self::highlighter();
+
+        if ( $gutter ) {
+            $highlighter->withGutter( $gutter );
+            // return $highlighter->withGutter( $gutter )->parse( $code, $language );
         }
 
-        $highlighter = new Highlighter();
-        if ( $gutter ) {
-            return $highlighter->withGutter( $gutter )->parse( $code, $this->language );
-        }
-        return $highlighter->parse( $code, $this->language );
+        return $highlighter->parse( $code, $language );
+    }
+
+    final protected static function highlighter() : Highlighter
+    {
+        return self::$highlighter ??= new Highlighter();
     }
 }
 
@@ -178,7 +186,7 @@ final class CodeComponent extends AbstractComponent
 //             unset( $content[$index] );
 //         }
 //     }
-//     $this->code = \implode( '', $content );
+//     $code = \implode( '', $content );
 //
 //     unset( $arguments['content'] );
 // }

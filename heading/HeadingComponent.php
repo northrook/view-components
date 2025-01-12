@@ -45,13 +45,6 @@ use Core\View\Template\ViewElement;
 #[ViewComponent( Tag::HEADING, true, 128 )]
 final class HeadingComponent extends AbstractComponent
 {
-    use InnerContent;
-
-    protected function render() : string
-    {
-        return $this->getView()->render();
-    }
-
     public function getView() : ViewElement
     {
         $this->attributes->class->add( 'heading', true );
