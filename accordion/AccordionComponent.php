@@ -16,9 +16,12 @@ use Support\Normalize;
 #[ViewComponent( 'accordion', true, 128 )]
 final class AccordionComponent extends AbstractComponent
 {
-    protected function render() : string
+    public function getView() : ViewElement
     {
-        return $this->getView()->render();
+        return $this::view(
+            'Accordion title',
+            'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+        );
     }
 
     /**
@@ -77,13 +80,5 @@ final class AccordionComponent extends AbstractComponent
         $view->content->set( 'section', $section );
 
         return $view;
-    }
-
-    public function getView() : ViewElement
-    {
-        return $this::view(
-            'Accordion title',
-            'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-        );
     }
 }

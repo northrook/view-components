@@ -49,9 +49,13 @@ final class HeadingComponent extends AbstractComponent
     {
         $this->attributes->class->add( 'heading', true );
 
+        $heading    = $this->innerContent->getArray();;
+
+        dump($heading);
+
         return $this::view(
             $this->view->tag->getTagName(),
-            __METHOD__,
+            $this->innerContent->getString(),
         );
     }
 

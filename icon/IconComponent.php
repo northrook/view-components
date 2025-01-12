@@ -18,11 +18,6 @@ final class IconComponent extends AbstractComponent
 
     public function __construct( private readonly IconProviderInterface $iconProvider ) {}
 
-    protected function render() : string
-    {
-        return $this->getView()->render();
-    }
-
     public function getView() : ViewElement
     {
         $icon = $this->iconProvider->get( $this->icon ?? '' );
