@@ -7,6 +7,8 @@ namespace Core\View\Component;
 use Core\View\Attribute\ViewComponent;
 use Core\View\Html\{Attributes, Element, HtmlNode, Tag};
 use Core\View\Template\ViewElement;
+use Stringable;
+use Support\Str;
 
 /**
  * Headings
@@ -40,7 +42,7 @@ use Core\View\Template\ViewElement;
  *
  * I'm personally leaning towards the regular <h1> tag.
  * It may be worthwhile having an option to include the sub-heading in the
- * heading or not, would need more validation.
+ * heading or not, would need more validation.å
  */
 #[ViewComponent( Tag::HEADING, true, 128 )]
 final class HeadingComponent extends AbstractComponent
@@ -49,39 +51,80 @@ final class HeadingComponent extends AbstractComponent
     {
         $this->attributes->class->add( 'heading', true );
 
-        $heading    = $this->innerContent->getArray();;
+        $heading          = [];
+        $subheading       = null;
+        $subheadingBefore = false;
+        $prepend          = [];
+        $append           = [];
 
-        dump($heading);
+        $innerContent = $this->innerContent->getArray();
+
+        foreach ( $innerContent as $key => $value ) {
+            if ( \is_string( $key ) ) {
+                if ( ! $subheading && Str::startsWith( $key, ['small', 'p'] ) ) {
+                    $subheadingBefore = \array_key_first( $innerContent ) === $key;
+                    $subheading       = $value;
+
+                    continue;
+                }
+                if ( Str::startsWith( $key, ['div', 'i', 'svg', 'picture', 'img', 'canvas', 'video'] ) ) {
+                    if ( ! $heading ) {
+                        $prepend[] = $value;
+                    }
+                    else {
+                        $append[] = $value;
+                    }
+
+                    continue;
+                }
+            }
+            $heading[] = $value;
+        }
+
+        $heading = \implode( ' ', $heading );
+        $prepend = \implode( ' ', $prepend ) ?: null;
+        $append  = \implode( ' ', $append ) ?: null;
+
+        // dd( $heading, $subheading, $subheadingBefore, $prepend, $append );
 
         return $this::view(
-            $this->view->tag->getTagName(),
-            $this->innerContent->getString(),
+            level            : $this->view->tag->getTagName(),
+            heading          : $heading,
+            subheading       : $subheading,
+            subheadingBefore : $subheadingBefore,
+            prependHtml      : $prepend,
+            appendHtml       : $append,
+            attributes       : $this->attributes,
         );
     }
 
     /**
      * @param int|string                                                             $level
-     * @param string                                                                 $heading
-     * @param null|string                                                            $subheading
+     * @param string|Stringable                                                      $heading
+     * @param null|string|Stringable                                                 $subheading
      * @param bool                                                                   $subheadingBefore
      * @param bool                                                                   $hGroup
+     * @param null|string|Stringable                                                 $prependHtml
+     * @param null|string|Stringable                                                 $appendHtml
      * @param array<array-key, null|array<array-key, string>|bool|string>|Attributes $attributes
      *
      * @return ViewElement
      */
     public static function view(
-        string|int       $level,
-        string           $heading,
-        ?string          $subheading = null,
-        bool             $subheadingBefore = false,
-        bool             $hGroup = false,
-        array|Attributes $attributes = [],
+        string|int             $level,
+        string|Stringable      $heading,
+        null|string|Stringable $subheading = null,
+        bool                   $subheadingBefore = false,
+        bool                   $hGroup = false,
+        null|string|Stringable $prependHtml = null,
+        null|string|Stringable $appendHtml = null,
+        array|Attributes       $attributes = [],
     ) : ViewElement {
         $level = Element\Heading::validLevel( $level );
 
         $heading = new Element(
             $hGroup ? "h{$level}" : 'span',
-            HtmlNode::extractAttributes( $heading, true ),
+            HtmlNode::extractAttributes( $heading, true, true ),
             HtmlNode::unwrap( $heading ),
         );
 
@@ -91,6 +134,8 @@ final class HeadingComponent extends AbstractComponent
                 HtmlNode::extractAttributes( $subheading, true, true ),
                 HtmlNode::unwrap( $subheading ),
             );
+
+            $subheading->attributes->class->add( 'subheading', true );
         }
 
         $view = new ViewElement(
@@ -105,6 +150,14 @@ final class HeadingComponent extends AbstractComponent
         }
 
         $view->attributes->class->add( ['heading'], true );
+
+        if ( $prependHtml ) {
+            $view->content->prepend( $prependHtml );
+        }
+
+        if ( $appendHtml ) {
+            $view->content->append( $appendHtml );
+        }
 
         return $view;
     }
