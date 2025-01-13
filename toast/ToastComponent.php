@@ -54,7 +54,7 @@ final class ToastComponent extends AbstractComponent
 
     public string $when;
 
-    public string $icon;
+    public ?string $icon = null;
 
     /**
      * @param IconProviderInterface $iconProvider [lazy]
@@ -107,7 +107,7 @@ final class ToastComponent extends AbstractComponent
     private function icon() : string
     {
         return (string) $this->iconProvider->get(
-            $this->icon,
+            $this->icon ?? $this->status,
             ['height' => '1rem', 'width' => '1rem'],
         );
     }
