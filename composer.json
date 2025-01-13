@@ -36,7 +36,6 @@
     "northrook/core-symfony": "dev-main",
     "northrook/view": "dev-main",
     "northrook/view-icons": "dev-main",
-    "tempest/highlight": "@stable",
     "northrook/highlight": "dev-main"
   },
   "require-dev": {

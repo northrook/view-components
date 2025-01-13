@@ -12,7 +12,7 @@ use Support\{Highlight, Str};
 use const Support\AUTO;
 use Stringable;
 
-#[ViewComponent( ['pre', 'code', 'pre:{language}', 'code:{language}:block'], true, -256 )]
+#[ViewComponent( ['pre', 'code', 'pre:{language}', 'code:{language}:{block}'], true, -256 )]
 final class CodeComponent extends AbstractComponent
 {
     protected bool $tidy = false;
