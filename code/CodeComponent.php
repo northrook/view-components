@@ -7,17 +7,14 @@ namespace Core\View\Component;
 use Core\View\Attribute\ViewComponent;
 use Core\View\Html\Attributes;
 use Core\View\Template\ViewElement;
-use Support\Str;
-use Tempest\Highlight\{Highlighter, Language, Languages\Text\TextLanguage};
+use Tempest\Highlight\Language;
+use Support\{Highlight, Str};
 use const Support\AUTO;
 use Stringable;
-use InvalidArgumentException;
 
 #[ViewComponent( ['pre', 'code', 'pre:{language}', 'code:{language}:block'], true, -256 )]
 final class CodeComponent extends AbstractComponent
 {
-    private static ?Highlighter $highlighter;
-
     protected bool $tidy = false;
 
     protected null|string|false $language = null;
@@ -26,13 +23,7 @@ final class CodeComponent extends AbstractComponent
 
     protected ?int $gutter = null;
 
-    private string $code;
-
-    public function __construct()
-    {
-        // Reset the Highlighter on instantiation
-        $this::$highlighter = null;
-    }
+    protected string $code;
 
     public function getView() : ViewElement
     {
@@ -60,6 +51,7 @@ final class CodeComponent extends AbstractComponent
      * @param string                                                              $code
      * @param bool                                                                $block      [false] Inline `<code>` by default
      * @param null|false|Language|string                                          $language
+     * @param null|int                                                            $gutter
      * @param bool                                                                $tidy
      * @param array<string, null|array<array-key, string>|bool|string>|Attributes $attributes
      *
@@ -69,6 +61,7 @@ final class CodeComponent extends AbstractComponent
         string                     $code,
         bool                       $block = false,
         false|null|string|Language $language = AUTO,
+        ?int                       $gutter = null,
         bool                       $tidy = false,
         array|Attributes           $attributes = [],
     ) : ViewElement {
@@ -88,17 +81,17 @@ final class CodeComponent extends AbstractComponent
         }
 
         if ( false !== $language ) {
-            $code  = self::highlight( $code, $language );
-            $lines = \substr_count( $code, PHP_EOL );
+            $highlight = new Highlight( $code, $language, $gutter );
+            $lines     = \substr_count( $code, PHP_EOL );
             if ( $lines ) {
                 $view->attributes->add( 'code-lines', $lines + 1 );
             }
-            $view->attributes->add( 'code-language', $language );
+            $view->attributes->add( 'code-language', $highlight->language->getName() );
+            $code = $highlight->__toString();
         }
 
         $view->content( $code );
 
-        dump( \get_defined_vars() );
         return $view;
     }
 
@@ -137,39 +130,5 @@ final class CodeComponent extends AbstractComponent
         }
 
         return \implode( "\n", $lines );
-    }
-
-    public static function highlight(
-        string               $code,
-        null|string|Language $language = AUTO,
-        ?int                 $gutter = null,
-    ) : string {
-        // Bail early
-        if ( ! $code ) {
-            return '';
-        }
-
-        if ( AUTO === $language ) {
-            $language = match ( true ) {
-                (bool) \preg_match( '#^\h*<[a-z-:]*.+>\s*$#m', $code, $matches ) => 'html',
-                default                                                          => $language,
-            };
-        }
-
-        $language ??= new TextLanguage();
-
-        $highlighter = self::highlighter();
-
-        if ( $gutter ) {
-            $highlighter->withGutter( $gutter );
-            // return $highlighter->withGutter( $gutter )->parse( $code, $language );
-        }
-
-        return $highlighter->parse( $code, $language );
-    }
-
-    final protected static function highlighter() : Highlighter
-    {
-        return self::$highlighter ??= new Highlighter();
     }
 }
