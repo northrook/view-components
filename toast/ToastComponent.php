@@ -60,7 +60,8 @@ final class ToastComponent extends AbstractComponent
      * @param IconProviderInterface $iconProvider [lazy]
      */
     public function __construct(
-        #[Autowire( service : IconSet::class )] private readonly IconProviderInterface $iconProvider,
+        #[Autowire( service : IconSet::class )]
+        private readonly IconProviderInterface $iconProvider,
     ) {}
 
     public function getView() : ViewElement
@@ -75,7 +76,8 @@ final class ToastComponent extends AbstractComponent
      */
     protected function prepareArguments( array &$arguments ) : void
     {
-        $dateTime = $arguments['instances'][0] ?? $arguments['timestamp'] ?? 'now';
+        $instances = $arguments['instances']                                               ?? null;
+        $dateTime  = $instances ? \array_key_first( $instances ) : $arguments['timestamp'] ?? 'now';
 
         \assert(
             \is_string( $dateTime ) || \is_int( $dateTime ),
@@ -87,7 +89,7 @@ final class ToastComponent extends AbstractComponent
         $this->timestamp = $timestamp->unixTimestamp;
         $this->when      = $timestamp->format( $timestamp::FORMAT_HUMAN, true );
 
-        $this->icon = $arguments['icon'] ?? $arguments['status'] ?? 'notice';
+        unset( $arguments['instances'], $arguments['timestamp'] );
     }
 
     private function details() : string
@@ -149,7 +151,7 @@ final class ToastComponent extends AbstractComponent
     /**
      * @param string                                                              $message
      * @param ?string                                                             $description
-     * @param string                                                              $id
+     * @param ?string                                                              $id
      * @param string                                                              $status
      * @param ?int                                                                $timeout
      * @param int                                                                 $timestamp
