@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Core\View\Component;
 
-use Core\View\Html\{Attributes, Content};
 use Core\View\Attribute\ViewComponent;
 use Core\View\Template\ViewElement;
 use Core\View\Html\Element\{Heading, Span};
+use Core\View\Html\{Attributes, Content};
 use Support\Normalize;
 
 /**

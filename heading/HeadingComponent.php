@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Core\View\Component;
 
 use Core\View\Attribute\ViewComponent;
-use Core\View\Html\{Attributes, Element, HtmlNode, Tag};
 use Core\View\Template\ViewElement;
+use Core\View\Html\{Attributes, Element, HtmlNode, Tag};
 use Stringable;
 use Support\Str;
 
