@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace Core\View\Component;
 
 use Core\View\Attribute\ViewComponent;
-use Core\View\Template\ViewElement;
-use Core\View\Html\{Attributes, Element, HtmlNode, Tag};
+use Core\View\Element;
+use Core\View\Element\{Attributes, Tag};
+use Core\View\Html\HtmlNode;
 use Stringable;
 use Support\Str;
 
@@ -47,7 +48,7 @@ use Support\Str;
 #[ViewComponent( Tag::HEADING, true, 128 )]
 final class HeadingComponent extends AbstractComponent
 {
-    public function getView() : ViewElement
+    public function getView() : Element
     {
         $this->attributes->class->add( 'heading', true );
 
@@ -108,7 +109,7 @@ final class HeadingComponent extends AbstractComponent
      * @param null|string|Stringable                                                 $appendHtml
      * @param array<array-key, null|array<array-key, string>|bool|string>|Attributes $attributes
      *
-     * @return ViewElement
+     * @return Element
      */
     public static function view(
         string|int             $level,
@@ -119,7 +120,7 @@ final class HeadingComponent extends AbstractComponent
         null|string|Stringable $prependHtml = null,
         null|string|Stringable $appendHtml = null,
         array|Attributes       $attributes = [],
-    ) : ViewElement {
+    ) : Element {
         $level = Element\Heading::validLevel( $level );
 
         $heading = new Element(
@@ -138,7 +139,7 @@ final class HeadingComponent extends AbstractComponent
             $subheading->attributes->class->add( 'subheading', true );
         }
 
-        $view = new ViewElement(
+        $view = new Element(
             $hGroup ? 'hgroup' : "h{$level}",
             $attributes,
             $heading,

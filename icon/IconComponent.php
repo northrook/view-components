@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace Core\View\Component;
 
-use Core\View\Attribute\ViewComponent;
-use Core\View\Html\Attributes;
-use Core\View\IconView;
 use Core\View\Interface\IconProviderInterface;
-use Core\View\Template\ViewElement;
+use Core\View\Attribute\ViewComponent;
+use Core\View\Element\Attributes;
+use Core\View\{Element, Icon};
 use Northrook\Logger\Log;
 
 #[ViewComponent( 'icon:{icon}', true, 128 )]
@@ -18,7 +17,7 @@ final class IconComponent extends AbstractComponent
 
     public function __construct( private readonly IconProviderInterface $iconProvider ) {}
 
-    public function getView() : ViewElement
+    public function getView() : Element
     {
         $icon = $this->iconProvider->get( $this->icon ?? '' );
 
@@ -31,15 +30,15 @@ final class IconComponent extends AbstractComponent
     }
 
     /**
-     * @param IconView|string                                                     $svg
+     * @param Icon|string                                                         $svg
      * @param array<string, null|array<array-key, string>|bool|string>|Attributes $attributes
      *
-     * @return ViewElement
+     * @return Element
      */
     public static function view(
-        string|IconView  $svg,
+        string|Icon      $svg,
         array|Attributes $attributes = [],
-    ) : ViewElement {
-        return new ViewElement( 'i', $attributes, $svg );
+    ) : Element {
+        return new Element( 'i', $attributes, $svg );
     }
 }

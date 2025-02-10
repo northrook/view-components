@@ -8,8 +8,7 @@ namespace Core\View\Component;
 // This ID should be saved in a database, and be matched with an in-template pattern should the cache be cleared
 // The idea is to have each in-code anchor tag be editable from the back-end
 use Core\View\Attribute\ViewComponent;
-use Core\View\Html\Element;
-use Core\View\Template\ViewElement;
+use Core\View\Element;
 
 /**
  * @link https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a MDN
@@ -66,12 +65,12 @@ final class AnchorComponent extends AbstractComponent
         );
     }
 
-    public static function view() : ViewElement
+    public static function view() : Element
     {
-        return new ViewElement( 'a' );
+        return new Element( 'a' );
     }
 
-    public function getView() : ViewElement
+    public function getView() : Element
     {
         return $this::view();
     }

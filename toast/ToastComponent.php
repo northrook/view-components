@@ -30,10 +30,9 @@ namespace Core\View\Component;
  */
 
 use Core\View\Attribute\ViewComponent;
-use Core\View\Html\Attributes;
-use Core\View\IconSet;
+use Core\View\Element\Attributes;
+use Core\View\{Element, IconSet};
 use Core\View\Interface\IconProviderInterface;
-use Core\View\Template\ViewElement;
 use Support\Time;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
@@ -64,7 +63,7 @@ final class ToastComponent extends AbstractComponent
         private readonly IconProviderInterface $iconProvider,
     ) {}
 
-    public function getView() : ViewElement
+    public function getView() : Element
     {
         return $this::view( 'Hello there.' );
     }
@@ -151,7 +150,7 @@ final class ToastComponent extends AbstractComponent
     /**
      * @param string                                                              $message
      * @param ?string                                                             $description
-     * @param ?string                                                              $id
+     * @param ?string                                                             $id
      * @param string                                                              $status
      * @param ?int                                                                $timeout
      * @param int                                                                 $timestamp
@@ -159,7 +158,7 @@ final class ToastComponent extends AbstractComponent
      * @param string                                                              $when
      * @param string                                                              $icon
      *
-     * @return ViewElement
+     * @return Element
      */
     public static function view(
         string           $message,
@@ -171,10 +170,10 @@ final class ToastComponent extends AbstractComponent
         // string           $when,
         // string           $icon,
         array|Attributes $attributes = [],
-    ) : ViewElement {
+    ) : Element {
         $timestamp ??= \time();
 
-        $view = new ViewElement( 'toast', $attributes );
+        $view = new Element( 'toast', $attributes );
 
         return $view;
     }

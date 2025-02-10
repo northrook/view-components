@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace Core\View\Component;
 
 use Core\View\Attribute\ViewComponent;
-use Core\View\Template\ViewElement;
-use Core\View\Html\Element\{Heading, Span};
-use Core\View\Html\{Attributes, Content};
+use Core\View\Element\{Attributes, Content, Tag};
+use Core\View\Element;
 use Support\Normalize;
 
 /**
@@ -16,7 +15,7 @@ use Support\Normalize;
 #[ViewComponent( 'accordion', true, 128 )]
 final class AccordionComponent extends AbstractComponent
 {
-    public function getView() : ViewElement
+    public function getView() : Element
     {
         return $this::view(
             'Accordion title',
@@ -25,35 +24,35 @@ final class AccordionComponent extends AbstractComponent
     }
 
     /**
-     * @param Heading|Span|string                                                 $title
+     * @param Element|string                                                      $title
      * @param Content|string                                                      $content
      * @param bool                                                                $open
      * @param null|string                                                         $icon
      * @param array<string, null|array<array-key, string>|bool|string>|Attributes $attributes
      *
-     * @return ViewElement
+     * @return Element
      */
     public static function view(
-        string|Span|Heading $title,
-        string|Content      $content,
-        bool                $open = false,
-        ?string             $icon = null,
-        array|Attributes    $attributes = [],
-    ) : ViewElement {
-        $view = new ViewElement(
+        string|Element   $title,
+        string|Content   $content,
+        bool             $open = false,
+        ?string          $icon = null,
+        array|Attributes $attributes = [],
+    ) : Element {
+        $view = new Element(
             tag        : 'accordion',
             attributes : $attributes,
         );
 
         if ( \is_string( $title ) ) {
-            $title = new Span( [], $title );
+            $title = new Element( 'span', content : $title );
         }
 
         if ( ! $content instanceof Content ) {
             $content = new Content( $content );
         }
 
-        if ( ! $title instanceof Heading ) {
+        if ( ! Tag::isHeading( $title->tag ) ) {
             $title->attributes->set( 'role', 'heading' );
         }
 

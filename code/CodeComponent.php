@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Core\View\Component;
 
 use Core\View\Attribute\ViewComponent;
-use Core\View\Html\Attributes;
-use Core\View\Template\ViewElement;
+use Core\View\Element\Attributes;
+use Core\View\Element;
 use Tempest\Highlight\Language;
 use Support\{Highlight, Str};
 use const Support\AUTO;
@@ -25,7 +25,7 @@ final class CodeComponent extends AbstractComponent
 
     protected string $code;
 
-    public function getView() : ViewElement
+    public function getView() : Element
     {
         $this->code = $this->innerContent->getString();
         // dump( $this );
@@ -55,7 +55,7 @@ final class CodeComponent extends AbstractComponent
      * @param bool                                                                $tidy
      * @param array<string, null|array<array-key, string>|bool|string>|Attributes $attributes
      *
-     * @return ViewElement
+     * @return Element
      */
     public static function view(
         string                     $code,
@@ -64,8 +64,8 @@ final class CodeComponent extends AbstractComponent
         ?int                       $gutter = null,
         bool                       $tidy = false,
         array|Attributes           $attributes = [],
-    ) : ViewElement {
-        $view = new ViewElement(
+    ) : Element {
+        $view = new Element(
             $block ? 'pre' : 'code',
             $attributes,
         );
