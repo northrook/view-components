@@ -9,7 +9,7 @@ use Core\View\Element;
 use Core\View\Element\{Attributes, Tag};
 use Core\View\Html\HtmlNode;
 use Stringable;
-use Support\Str;
+use Support\{Num, Str};
 
 /**
  * Headings
@@ -121,7 +121,8 @@ final class HeadingComponent extends AbstractComponent
         null|string|Stringable $appendHtml = null,
         array|Attributes       $attributes = [],
     ) : Element {
-        $level = Element\Heading::validLevel( $level );
+        $heading = (string) $heading;
+        $level   = Num::clamp( (int) $level, 1, 6 );
 
         $heading = new Element(
             $hGroup ? "h{$level}" : 'span',
@@ -130,6 +131,7 @@ final class HeadingComponent extends AbstractComponent
         );
 
         if ( $subheading ) {
+            $subheading = (string) $subheading;
             $subheading = new Element(
                 $hGroup ? 'p' : 'small',
                 HtmlNode::extractAttributes( $subheading, true, true ),

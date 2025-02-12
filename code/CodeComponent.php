@@ -80,7 +80,7 @@ final class CodeComponent extends AbstractComponent
             /** @var string $code */
         }
 
-        if ( false !== $language ) {
+        if ( $language !== false ) {
             $highlight = new Highlight( $code, $language, $gutter );
             $lines     = \substr_count( $code, PHP_EOL );
             if ( $lines ) {
