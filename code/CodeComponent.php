@@ -9,6 +9,7 @@ use Core\View\Element\Attributes;
 use Core\View\Element;
 use Tempest\Highlight\Language;
 use Support\{Highlight, Str};
+use function Support\str_replace_each;
 use const Support\AUTO;
 use Stringable;
 
@@ -73,11 +74,7 @@ final class CodeComponent extends AbstractComponent
         $code = $block ? self::codeBlock( $code ) : self::codeInline( $code );
 
         if ( $tidy ) {
-            $code = Str::replaceEach(
-                [' ), );' => ' ) );'],
-                $code,
-            );
-            /** @var string $code */
+            $code = (string) str_replace_each( [' ), );' => ' ) );'], $code );
         }
 
         if ( $language !== false ) {

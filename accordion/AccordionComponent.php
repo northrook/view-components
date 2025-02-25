@@ -7,7 +7,7 @@ namespace Core\View\Component;
 use Core\View\Attribute\ViewComponent;
 use Core\View\Element\{Attributes, Content, Tag};
 use Core\View\Element;
-use Support\Normalize;
+use function Support\slug;
 
 /**
  * https://www.nngroup.com/articles/accordion-icons/
@@ -57,7 +57,7 @@ final class AccordionComponent extends AbstractComponent
         }
 
         if ( ! $view->attributes->has( 'id' ) ) {
-            $view->attributes->set( 'id', Normalize::key( (string) $title->content.(string) $content ) );
+            $view->attributes->set( 'id', slug( (string) $title->content.(string) $content ) );
         }
 
         $state     = $open ? 'true' : 'false';

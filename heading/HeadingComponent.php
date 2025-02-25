@@ -7,9 +7,8 @@ namespace Core\View\Component;
 use Core\View\Attribute\ViewComponent;
 use Core\View\Element;
 use Core\View\Element\{Attributes, Tag};
-use Core\View\Html\HtmlNode;
 use Stringable;
-use Support\{Num, Str};
+use function Support\{num_clamp, str_starts_with_any};
 
 /**
  * Headings
@@ -62,13 +61,13 @@ final class HeadingComponent extends AbstractComponent
 
         foreach ( $innerContent as $key => $value ) {
             if ( \is_string( $key ) ) {
-                if ( ! $subheading && Str::startsWith( $key, ['small', 'p'] ) ) {
+                if ( ! $subheading && str_starts_with_any( $key, 'small', 'p' ) ) {
                     $subheadingBefore = \array_key_first( $innerContent ) === $key;
                     $subheading       = $value;
 
                     continue;
                 }
-                if ( Str::startsWith( $key, ['div', 'i', 'svg', 'picture', 'img', 'canvas', 'video'] ) ) {
+                if ( str_starts_with_any( $key, 'div', 'i', 'svg', 'picture', 'img', 'canvas', 'video' ) ) {
                     if ( ! $heading ) {
                         $prepend[] = $value;
                     }
@@ -122,20 +121,20 @@ final class HeadingComponent extends AbstractComponent
         array|Attributes       $attributes = [],
     ) : Element {
         $heading = (string) $heading;
-        $level   = Num::clamp( (int) $level, 1, 6 );
+        $level   = num_clamp( (int) $level, 1, 6 );
 
         $heading = new Element(
             $hGroup ? "h{$level}" : 'span',
-            HtmlNode::extractAttributes( $heading, true, true ),
-            HtmlNode::unwrap( $heading ),
+            Attributes::extract( $heading, true ),
+            $heading,
         );
 
         if ( $subheading ) {
             $subheading = (string) $subheading;
             $subheading = new Element(
                 $hGroup ? 'p' : 'small',
-                HtmlNode::extractAttributes( $subheading, true, true ),
-                HtmlNode::unwrap( $subheading ),
+                Attributes::extract( $subheading, true ),
+                $subheading,
             );
 
             $subheading->attributes->class->add( 'subheading', true );

@@ -39,7 +39,6 @@
     "northrook/highlight": "dev-main"
   },
   "require-dev": {
-    "phpstan/phpstan": "@stable",
-    "northrook/dev-env": "dev-main"
+    "northrook/dev": "dev-main"
   }
 }
