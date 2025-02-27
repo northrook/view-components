@@ -55,6 +55,8 @@ final class ToastComponent extends AbstractComponent
 
     public ?string $icon = null;
 
+    public bool $compact = false;
+
     /**
      * @param IconProviderInterface $iconProvider [lazy]
      */
@@ -128,19 +130,27 @@ final class ToastComponent extends AbstractComponent
             ->set( 'id', $this->id )
             ->class->add( "intent:{$this->status}" );
 
-        // dump( [$this::class, $this] );
+        // Add a 'compact' mode for replacing the status text with message
+
+        if ( $this->compact ) {
+            $type    = '<span data-message>'.\trim( $this->message, " \n\r\t\v\0." ).'</span>';
+            $message = null;
+        }
+        else {
+            $message = "<span data-message>{$this->message}</span>";
+            $type    = "<span data-type>{$this->status}</span>";
+        }
+
         return <<<HTML
             <toast {$this->attributes}>
                 <button class="close" aria-label="Close" type="button"></button>
                 <output role="status">
                     <i class="status">
                         {$this->icon()}
-                        <span class="status-type">{$this->status}</span>
-                        <time datetime="{$this->timestamp}">
-                            {$this->when}
-                        </time>
+                        {$type}
+                        <time datetime="{$this->timestamp}">{$this->when}</time>
                     </i>
-                    <span class="message">{$this->message}</span>
+                    {$message}
                 </output>
                 {$this->details()}
             </toast>
