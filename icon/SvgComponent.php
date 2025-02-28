@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Core\View\Component;
 
 use Core\View\Attribute\ViewComponent;
-use Core\View\Element;
-use Core\View\Interface\IconProviderInterface;
+use Core\View\{Element, Icon};
+use Core\Interface\IconProviderInterface;
 use Northrook\Logger\Log;
 use InvalidArgumentException;
 
@@ -17,11 +17,21 @@ final class SvgComponent extends AbstractComponent
 
     public function __construct( private readonly IconProviderInterface $iconProvider ) {}
 
+    /**
+     * @return Element<Icon>
+     */
     public function getView() : Element
     {
         $icon = $this->iconProvider->get( $this->icon ?? '' );
 
-        if ( ! $icon?->isValid ) {
+        if ( ! $icon ) {
+            Log::error( $this::class.': No icon key provided.' );
+            throw new InvalidArgumentException( 'No icon key provided.' );
+        }
+
+        \assert( $icon instanceof Icon );
+
+        if ( ! $icon->isValid ) {
             Log::error( $this::class.': No icon key provided.' );
             throw new InvalidArgumentException( 'No icon key provided.' );
         }

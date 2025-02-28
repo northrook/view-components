@@ -29,14 +29,19 @@ namespace Core\View\Component;
 
  */
 
+use Core\Interface\IconProviderInterface;
 use Core\View\Attribute\ViewComponent;
 use Core\View\Element\Attributes;
 use Core\View\{Element, IconSet};
-use Core\View\Interface\IconProviderInterface;
+use JetBrains\PhpStorm\Deprecated;
 use Support\Time;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
-#[ViewComponent( 'toast:{status}' )]
+// ! Might be worth moving this into the Toast::class?
+// . provide a default icon for each $status, allow passing an optional IconProvider
+
+// #[ViewComponent( 'toast:{status}' )]
+#[Deprecated( 'Temporarily removed. Will be re-added in a future release.' )]
 final class ToastComponent extends AbstractComponent
 {
     public string $id;
@@ -110,8 +115,9 @@ final class ToastComponent extends AbstractComponent
     private function icon() : string
     {
         return (string) $this->iconProvider->get(
-            $this->icon ?? $this->status,
-            ['height' => '1rem', 'width' => '1rem'],
+            icon   : $this->icon ?? $this->status,
+            height : '1rem',
+            width  : '1rem',
         );
     }
 

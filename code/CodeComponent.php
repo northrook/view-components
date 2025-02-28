@@ -8,7 +8,7 @@ use Core\View\Attribute\ViewComponent;
 use Core\View\Element\Attributes;
 use Core\View\Element;
 use Tempest\Highlight\Language;
-use Support\{Highlight, Str};
+use Support\Highlight;
 use function Support\str_replace_each;
 use const Support\AUTO;
 use Stringable;
