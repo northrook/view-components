@@ -125,16 +125,16 @@ final class HeadingComponent extends AbstractComponent
 
         $heading = new Element(
             $hGroup ? "h{$level}" : 'span',
-            Attributes::extract( $heading, true ),
             $heading,
+            Attributes::extract( $heading, true ),
         );
 
         if ( $subheading ) {
             $subheading = (string) $subheading;
             $subheading = new Element(
                 $hGroup ? 'p' : 'small',
-                Attributes::extract( $subheading, true ),
                 $subheading,
+                Attributes::extract( $subheading, true ),
             );
 
             $subheading->attributes->class->add( 'subheading', true );
@@ -142,9 +142,11 @@ final class HeadingComponent extends AbstractComponent
 
         $view = new Element(
             $hGroup ? 'hgroup' : "h{$level}",
+            [
+                $heading,
+                $subheading,
+            ],
             $attributes,
-            $heading,
-            $subheading,
         );
 
         if ( $subheadingBefore ) {

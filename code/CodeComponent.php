@@ -68,6 +68,7 @@ final class CodeComponent extends AbstractComponent
     ) : Element {
         $view = new Element(
             $block ? 'pre' : 'code',
+            null,
             $attributes,
         );
 

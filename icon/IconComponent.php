@@ -47,6 +47,6 @@ final class IconComponent extends AbstractComponent
         string|Icon      $svg,
         array|Attributes $attributes = [],
     ) : Element {
-        return new Element( 'i', $svg, ...$attributes );
+        return new Element( 'i', $svg, $attributes );
     }
 }
