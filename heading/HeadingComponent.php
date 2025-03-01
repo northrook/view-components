@@ -44,7 +44,7 @@ use function Support\{num_clamp, str_starts_with_any};
  * It may be worthwhile having an option to include the sub-heading in the
  * heading or not, would need more validation.å
  */
-#[ViewComponent( Tag::HEADING, true, 128 )]
+#[ViewComponent( Tag::HEADING, true, 8 )]
 final class HeadingComponent extends AbstractComponent
 {
     public function getView() : Element
