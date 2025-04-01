@@ -7,6 +7,7 @@ namespace Core\View\Component;
 use Core\View\Attribute\ViewComponent;
 use Core\View\Element\{Attributes, Content, Tag};
 use Core\View\Element;
+use Core\View\Template\AbstractComponent;
 use function Support\slug;
 
 /**

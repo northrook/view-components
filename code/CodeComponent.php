@@ -12,6 +12,7 @@ use Support\Highlight;
 use function Support\str_replace_each;
 use const Support\AUTO;
 use Stringable;
+use Core\View\Template\AbstractComponent;
 
 #[ViewComponent( ['pre', 'code', 'pre:{language}', 'code:{language}:{block}'], true, -256 )]
 final class CodeComponent extends AbstractComponent

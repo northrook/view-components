@@ -8,6 +8,7 @@ use Core\View\Attribute\ViewComponent;
 use Core\View\Element;
 use Core\View\Element\{Attributes, Tag};
 use Stringable;
+use Core\View\Template\AbstractComponent;
 use function Support\{num_clamp, str_starts_with_any};
 
 /**

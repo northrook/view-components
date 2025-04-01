@@ -9,6 +9,7 @@ namespace Core\View\Component;
 // The idea is to have each in-code anchor tag be editable from the back-end
 use Core\View\Attribute\ViewComponent;
 use Core\View\Element;
+use Core\View\Template\AbstractComponent;
 
 /**
  * @link https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a MDN

@@ -9,9 +9,10 @@ use Core\View\Attribute\ViewComponent;
 use Core\View\Element\Attributes;
 use Core\View\{Element, Icon};
 use Northrook\Logger\Log;
+use Core\View\Template\AbstractComponent;
 use InvalidArgumentException;
 
-#[ViewComponent( 'icon:{icon}', true, 128 )]
+#[ViewComponent( 'icon:{icon}', true, 142 )]
 final class IconComponent extends AbstractComponent
 {
     protected ?string $icon;

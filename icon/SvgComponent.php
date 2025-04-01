@@ -8,6 +8,7 @@ use Core\View\Attribute\ViewComponent;
 use Core\View\{Element, Icon};
 use Core\Interface\IconProviderInterface;
 use Northrook\Logger\Log;
+use Core\View\Template\AbstractComponent;
 use InvalidArgumentException;
 
 #[ViewComponent( 'svg:{icon}', true, 144 )]
@@ -20,7 +21,7 @@ final class SvgComponent extends AbstractComponent
     /**
      * @return Element<Icon>
      */
-    public function getView() : Element
+    public function getView() : Icon
     {
         $icon = $this->iconProvider->get( $this->icon ?? '' );
 
