@@ -22,46 +22,41 @@ final class ImageComponent extends Component
 
     public function __construct( private readonly AssetManager $assetManager ) {}
 
-    public function render() : string
-    {
-        return __METHOD__;
-    }
+    // public function getElementNode( ?Position $position = null, ?ElementNode $parent = null ) : ElementNode
+    // {
+    //     $node = $this->getComponentNode();
+    //
+    //     // if ( ! $node instanceof ElementNode ) {
+    //     //     dd( \get_defined_vars(), $this );
+    //     //     throw new RuntimeException();
+    //     // }
+    //     //
+    //     // $node->parent   = $parent;
+    //     $node->position = $position;
+    //
+    //     return $node;
+    // }
 
-    public function getElementNode( ?Position $position = null, ?ElementNode $parent = null ) : ElementNode
-    {
-        $node = $this->getNode();
-
-        if ( ! $node instanceof ElementNode ) {
-            dd( \get_defined_vars(), $this );
-            throw new RuntimeException();
-        }
-
-        $node->parent   = $parent;
-        $node->position = $position;
-
-        return $node;
-    }
-
-    protected function getNode() : Node
-    {
-        $engine = $this->getEngine();
-
-        // $template = $engine->createTemplate(
-        //     'component/image.latte',
-        //     ['src' => $this->source],
-        // );
-
-        $template = 'component/image.latte';
-        // $template = $this->template();
-
-        $ast = $engine->parse( $template );
-
-        $engine->applyPasses( $ast );
-
-        $string = $engine->generate( $ast, $template );
-        dump( \get_defined_vars() );
-        return $ast->main;
-    }
+    // protected function getNode() : Node
+    // {
+    //     $engine = $this->getEngine();
+    //
+    //     // $template = $engine->createTemplate(
+    //     //     'component/image.latte',
+    //     //     ['src' => $this->source],
+    //     // );
+    //
+    //     $template = 'component/image.latte';
+    //     // $template = $this->template();
+    //
+    //     $ast = $engine->parse( $template );
+    //
+    //     $engine->applyPasses( $ast );
+    //
+    //     $string = $engine->generate( $ast, $template );
+    //     dump( \get_defined_vars() );
+    //     return $ast->main;
+    // }
 
     // private function template() : string
     // {
@@ -94,5 +89,10 @@ final class ImageComponent extends Component
             $this->source = $arguments['attributes']['src'];
             unset( $arguments['attributes']['src'] );
         }
+    }
+
+    protected function getTemplateParameters() : array
+    {
+        return ['src' => $this->source];
     }
 }
