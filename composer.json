@@ -17,11 +17,8 @@
         "anchor",
         "button",
         "code",
-        "combobox",
         "heading",
-        "input",
-        "navigation",
-        "toast"
+        "navigation"
       ]
     }
   },
