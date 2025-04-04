@@ -9,14 +9,14 @@ use Core\Asset\ImageAsset;
 use Core\View\Attribute\ViewComponent;
 use Core\View\Template\Component;
 
-#[ViewComponent( ['img', 'img:{type}'], true, 60 )]
+#[ViewComponent( ['img', 'img:{type}'], true )]
 final class ImageComponent extends Component
 {
     protected const string FALLBACK = '';
 
     public string $source;
 
-    public ?string $type = null;
+    public ?string $type = 'image';
 
     public readonly ImageAsset $image;
 
@@ -24,24 +24,20 @@ final class ImageComponent extends Component
 
     protected function prepareArguments( array &$arguments ) : void
     {
-        if ( \is_string( $arguments['attributes']['src'] ?? null ) ) {
-            $this->source = $arguments['attributes']['src'];
-            unset( $arguments['attributes']['src'] );
-        }
-        else {
-            $this->source = $this::FALLBACK;
-        }
-    }
+        $source  = $arguments['attributes']['src']      ?? $this::FALLBACK;
+        $assetID = $arguments['attributes']['asset-id'] ?? null;
 
-    protected function getTemplateParameters() : self
-    {
-        if ( ! isset( $this->image ) ) {
-            $imageAsset = $this->assetManager->getAsset( $this->source );
+        \assert( \is_string( $source ) );
+        \assert( \is_string( $assetID ) || \is_null( $assetID ) );
 
-            \assert( $imageAsset instanceof ImageAsset );
+        $this->image  = $this->assetManager->getImage( $source, $assetID );
+        $this->source = $source;
 
-            $this->image = $imageAsset;
-        }
-        return $this;
+        $this->attributes->class->add( $this->type );
+
+        unset(
+            $arguments['attributes']['src'],
+            $arguments['attributes']['asset-id'],
+        );
     }
 }
