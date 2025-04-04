@@ -8,21 +8,23 @@ use Core\Asset\ImageAsset;
 use Core\AssetManager;
 use Core\View\Attribute\ViewComponent;
 use Core\View\Template\Component;
+use Core\View\Template\Runtime\Html;
+use Core\View\Template\Runtime\HtmlStringable;
 
 #[ViewComponent( ['img', 'img:{type}'], true, 60 )]
 final class ImageComponent extends Component
 {
-    protected string $source;
+    public ?string $source = null;
 
-    protected ?string $type = null;
+    public ?string $type = null;
 
-    public readonly ImageAsset $asset;
+    public readonly ImageAsset $image;
 
     public function __construct( private readonly AssetManager $assetManager ) {}
 
     protected function resolveAsset() : void
     {
-        if ( isset( $this->asset ) ) {
+        if ( isset( $this->image ) ) {
             return;
         }
 
@@ -30,7 +32,7 @@ final class ImageComponent extends Component
 
         \assert( $imageAsset instanceof ImageAsset );
 
-        $this->asset = $imageAsset;
+        $this->image = $imageAsset;
     }
 
     protected function prepareArguments( array &$arguments ) : void
@@ -41,11 +43,30 @@ final class ImageComponent extends Component
         }
     }
 
-    /**
-     * @return array{src: string}
-     */
-    protected function getTemplateParameters() : array
+    protected function getTemplateParameters() : self
     {
-        return ['src' => $this->source];
+        return $this;
     }
+
+    // private function getImage() : HtmlStringable
+    // {
+    //     $imageAsset = $this->assetManager->getAsset( $this->source );
+    //     // var_dump( $this->image );
+    //     return new Html(
+    //             $imageAsset->getPicture(
+    //             // component_id : $this->uniqueID,
+    //             ),
+    //     );
+    // }
+    //
+    // /**
+    //  * @return array{src: string}
+    //  */
+    // protected function getTemplateParameters() : array
+    // {
+    //     return [
+    //             'image'  => $this->getImage(),
+    //             'source' => $this->source ?? 'lamb source',
+    //     ];
+    // }
 }
