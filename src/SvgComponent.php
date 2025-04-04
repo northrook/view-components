@@ -4,31 +4,30 @@ declare(strict_types=1);
 
 namespace Core\View\Component;
 
-use Core\Interface\IconProviderInterface;
 use Core\View\Attribute\ViewComponent;
-use Core\View\{Icon, Template\Component, Template\Runtime\Html};
+use Core\Interface\IconProviderInterface;
+use Core\View\Icon;
+use Core\View\Template\Component;
+use Core\View\Template\Runtime\Html;
 use InvalidArgumentException;
-use Stringable;
 
-#[ViewComponent( 'icon:{icon}' )]
-final class IconComponent extends Component
+#[ViewComponent( 'svg:{icon}' )]
+final class SvgComponent extends Component
 {
     protected string $icon;
 
     protected string $fallback = '';
 
-    public Stringable $svg;
-
     public function __construct( private readonly IconProviderInterface $iconProvider ) {}
 
-    protected function getParameters() : object|array
+    public function getString() : string
     {
         if ( ! $this->icon ) {
             $this->logger?->error( $this::class.': No icon key provided.' );
             throw new InvalidArgumentException( 'No icon key provided.' );
         }
 
-        $icon = $this->iconProvider->get( $this->icon, $this->fallback );
+        $icon = $this->iconProvider->get( $this->icon, $this->fallback, ...$this->attributes->array );
 
         \assert( $icon instanceof Icon );
 
@@ -40,7 +39,6 @@ final class IconComponent extends Component
             $icon = new Html( '' );
         }
 
-        $this->svg = $icon;
-        return parent::getParameters();
+        return (string) $icon;
     }
 }
