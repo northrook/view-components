@@ -1,6 +1,6 @@
 <?php
 
-namespace Core\View\Component;
+namespace Core\View\Element;
 
 use Core\Interface\{Printable, PrintableClass};
 use function Support\slug;
@@ -9,7 +9,7 @@ class Navigation implements Printable
 {
     use PrintableClass;
 
-    /** @var Element\ListItem[] */
+    /** @var ListItem[] */
     private array $items = [];
 
     public readonly string $id;
@@ -33,6 +33,10 @@ class Navigation implements Printable
         string|false $link = false,
         bool         $render = null,
     ) : MenuItem {
-        $this->items[] = [];
+        $item = new MenuItem( $label, $icon, $link );
+
+        $this->items[] = $item;
+
+        return $item;
     }
 }

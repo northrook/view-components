@@ -1,9 +1,7 @@
 <?php
 
-namespace Core\View\Component\Element;
+namespace Core\View\Element;
 
-use Core\View\Component\ViewElement;
-use Core\View\Element\Attributes;
 use UnitEnum;
 
 class ListItem extends ViewElement

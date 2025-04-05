@@ -1,6 +1,6 @@
 <?php
 
-namespace Core\View\Component;
+namespace Core\View\Element;
 
 use Core\Interface\View;
 use Core\View\Element\{Attributes, Tag};

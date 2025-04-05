@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Core\View\Component;
+namespace Core\View;
 
 use Core\View\Attribute\ViewComponent;
 use Core\View\Template\Component;

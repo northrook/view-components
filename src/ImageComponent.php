@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Core\View\Component;
+namespace Core\View;
 
 use Core\AssetManager;
 use Core\Asset\ImageAsset;

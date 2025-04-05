@@ -1,6 +1,6 @@
 <?php
 
-namespace Core\View\Component\Element;
+namespace Core\View\Element;
 
 use Core\Interface\View;
 use const Support\AUTO;

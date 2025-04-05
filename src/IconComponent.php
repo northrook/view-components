@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Core\View\Component;
+namespace Core\View;
 
 use Core\Interface\IconProviderInterface;
 use Core\View\Attribute\ViewComponent;
-use Core\View\{Icon, Template\Component, Template\Runtime\Html};
+use Core\View\{Template\Component, Template\Runtime\Html};
 use InvalidArgumentException;
 use Stringable;
 
