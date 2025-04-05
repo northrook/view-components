@@ -7,7 +7,7 @@ namespace Core\View;
 use Core\View\Attribute\ViewComponent;
 use Core\View\Template\Component;
 
-#[ViewComponent( 'input:{type}', true, 16 )]
+#[ViewComponent( 'input:{type}' )]
 final class InputComponent extends Component
 {
     protected string $type = 'input';

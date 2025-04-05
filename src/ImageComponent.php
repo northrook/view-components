@@ -9,7 +9,7 @@ use Core\Asset\ImageAsset;
 use Core\View\Attribute\ViewComponent;
 use Core\View\Template\Component;
 
-#[ViewComponent( ['img', 'img:{type}'], true )]
+#[ViewComponent( ['img', 'img:{type}'] )]
 final class ImageComponent extends Component
 {
     protected const string FALLBACK = '';
