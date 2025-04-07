@@ -24,6 +24,24 @@ final class ImageComponent extends Component
 
     public function __construct( private readonly AssetManager $assetManager ) {}
 
+    /**
+     * @param string  $href
+     * @param string  $alt
+     * @param ?string $caption
+     * @param ?string $credit
+     *
+     * @return $this
+     */
+    public function __invoke(
+        string  $href,
+        string  $alt = '',
+        ?string $caption = null,
+        ?string $credit = null,
+    ) : self {
+        dump( \get_defined_vars() );
+        return $this;
+    }
+
     protected function prepareArguments( array &$arguments ) : void
     {
         $source  = $arguments['attributes']['src']      ?? $this::FALLBACK;

@@ -6,7 +6,6 @@ namespace Core\View;
 
 use Core\View\Attribute\ViewComponent;
 use Core\Interface\IconProviderInterface;
-use Core\View\Icon;
 use Core\View\Template\Component;
 use Core\View\Template\Runtime\Html;
 use InvalidArgumentException;
@@ -19,6 +18,20 @@ final class SvgComponent extends Component
     protected string $fallback = '';
 
     public function __construct( private readonly IconProviderInterface $iconProvider ) {}
+
+    /**
+     * @param string  $get
+     * @param ?string $fallback
+     *
+     * @return $this
+     */
+    public function __invoke(
+        string  $get,
+        ?string $fallback = null,
+    ) : self {
+        dump( \get_defined_vars() );
+        return $this;
+    }
 
     public function getString() : string
     {

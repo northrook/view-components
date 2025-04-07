@@ -14,6 +14,7 @@ final class InputComponent extends Component
 
     public string $input;
 
+
     protected function getRadio() : string
     {
         return __METHOD__;

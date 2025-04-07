@@ -17,6 +17,22 @@ final class AccordionComponent extends Component
 {
     public ?string $icon = null;
 
+    /**
+     * @param string  $title
+     * @param string  $content
+     * @param ?string $icon
+     *
+     * @return $this
+     */
+    public function __invoke(
+        string  $title,
+        string  $content,
+        ?string $icon = null,
+    ) : self {
+        dump( \get_defined_vars() );
+        return $this;
+    }
+
     // public function getView() : Element
     // {
     //     return $this::view(

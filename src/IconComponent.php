@@ -21,6 +21,20 @@ final class IconComponent extends Component
 
     public function __construct( private readonly IconProviderInterface $iconProvider ) {}
 
+    /**
+     * @param string  $get
+     * @param ?string $fallback
+     *
+     * @return $this
+     */
+    public function __invoke(
+        string  $get,
+        ?string $fallback = null,
+    ) : self {
+        dump( \get_defined_vars() );
+        return $this;
+    }
+
     protected function getParameters() : object|array
     {
         if ( ! $this->icon ) {

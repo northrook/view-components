@@ -6,6 +6,7 @@ namespace Core\View;
 
 use Core\View\Attribute\ViewComponent;
 use Core\View\Template\Component;
+use const Support\AUTO;
 
 #[ViewComponent( ['pre', 'code', 'pre:{language}', 'code:{language}:{block}'] )]
 final class CodeComponent extends Component
@@ -20,7 +21,25 @@ final class CodeComponent extends Component
 
     protected string $code;
 
-
+    /**
+     * @param string  $code
+     * @param ?string $language
+     * @param bool    $block
+     * @param ?int    $gutter
+     * @param bool    $tidy
+     *
+     * @return $this
+     */
+    public function __invoke(
+        string  $code,
+        ?string $language = AUTO,
+        bool    $block = false,
+        ?int    $gutter = null,
+        bool    $tidy = false,
+    ) : self {
+        dump( \get_defined_vars() );
+        return $this;
+    }
 
     // public function getView() : Element
     // {
