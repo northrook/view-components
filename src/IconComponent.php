@@ -5,15 +5,18 @@ declare(strict_types=1);
 namespace Core\View;
 
 use Core\Interface\IconProviderInterface;
-use Core\View\Attribute\ViewComponent;
-use Core\View\{Template\Component, Template\Runtime\Html};
+use Core\View\ComponentFactory\ViewComponent;
+use Core\View\Template\Component;
+use Core\View\Template\Runtime\Html;
 use InvalidArgumentException;
 use Stringable;
 
-#[ViewComponent( 'icon:{icon}' )]
+#[ViewComponent( 'icon:{icon}:{size}' )]
 final class IconComponent extends Component
 {
     protected string $icon;
+
+    protected ?int $size;
 
     protected string $fallback = '';
 
@@ -45,6 +48,10 @@ final class IconComponent extends Component
         $icon = $this->iconProvider->get( $this->icon, $this->fallback );
 
         \assert( $icon instanceof Icon );
+
+        if ( $this->size ) {
+            // TODO : Add $icon->attributes() to Icon::class
+        }
 
         if ( ! $icon->isValid ) {
             $this->logger?->error(

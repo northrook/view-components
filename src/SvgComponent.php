@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Core\View;
 
-use Core\View\Attribute\ViewComponent;
 use Core\Interface\IconProviderInterface;
+use Core\View\ComponentFactory\ViewComponent;
 use Core\View\Template\Component;
 use Core\View\Template\Runtime\Html;
 use InvalidArgumentException;

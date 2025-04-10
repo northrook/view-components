@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Core\View;
 
-use Core\View\Attribute\ViewComponent;
+use Core\View\ComponentFactory\ViewComponent;
 use Core\View\Template\Component;
 use const Support\AUTO;
 
@@ -15,7 +15,7 @@ final class CodeComponent extends Component
 
     protected null|string|false $language = null;
 
-    protected bool $block = false;
+    protected ?bool $block = false;
 
     protected ?int $gutter = null;
 

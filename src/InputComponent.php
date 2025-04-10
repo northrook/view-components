@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Core\View;
 
-use Core\View\Attribute\ViewComponent;
+use Core\View\ComponentFactory\ViewComponent;
 use Core\View\Template\Component;
 
 #[ViewComponent( 'input:{type}' )]
@@ -13,7 +13,6 @@ final class InputComponent extends Component
     protected string $type = 'input';
 
     public string $input;
-
 
     protected function getRadio() : string
     {
