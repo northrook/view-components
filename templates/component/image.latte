@@ -1,8 +1,15 @@
 {templateType Core\View\ImageComponent}
 <figure {$attributes}>
     <icon:success class="figure image" />
-    {$image}
-    <figcaption>
-        Caption Text
+    <picture style="aspect-ratio: {$aspect->getFloat()}">
+        {$blurhash}
+        {$sources}
+        {$image}
+    </picture>
+    <cite class="credit" n:ifcontent>
+        {$credit}
+    </cite>
+    <figcaption n:ifcontent>
+        {$caption}
     </figcaption>
 </figure>

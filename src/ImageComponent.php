@@ -8,13 +8,15 @@ use Core\AssetManager;
 use Core\View\ComponentFactory\ViewComponent;
 use Core\View\ImageComponent\{Blurhash, Image, Sources};
 use Core\View\Template\Component;
+use Support\Image\Aspect;
+use Stringable;
 
 #[ViewComponent( ['img', 'img:{type}'] )]
 final class ImageComponent extends Component
 {
     protected const string FALLBACK = '';
 
-    public string $source;
+    public string $src;
 
     public string $alt = '';
 
@@ -28,10 +30,16 @@ final class ImageComponent extends Component
 
     public readonly Image $image;
 
+    public readonly Aspect $aspect;
+
+    public null|string|Stringable $caption;
+
+    public null|string|Stringable $credit;
+
     public function __construct( private readonly AssetManager $assetManager ) {}
 
     /**
-     * @param string  $href
+     * @param string  $src
      * @param string  $alt
      * @param ?string $caption
      * @param ?string $credit
@@ -39,13 +47,14 @@ final class ImageComponent extends Component
      * @return $this
      */
     public function __invoke(
-        string  $href,
+        string  $src,
         string  $alt = '',
         ?string $caption = null,
         ?string $credit = null,
     ) : self {
-        dump( \get_defined_vars() );
-        return $this;
+        return $this->create(
+            ['src' => $src, 'alt' => $alt, 'caption' => $caption, 'credit' => $credit],
+        );
     }
 
     protected function prepareArguments(
@@ -54,7 +63,7 @@ final class ImageComponent extends Component
         array & $actions,
         array & $content,
     ) : void {
-        $properties['source']  = $attributes['src']     ?? $this::FALLBACK;
+        $properties['src']     = $attributes['src']     ?? $this::FALLBACK;
         $properties['alt']     = $attributes['alt']     ?? '';
         $properties['caption'] = $attributes['caption'] ?? null;
         $properties['credit']  = $attributes['credit']  ?? null;
@@ -64,18 +73,18 @@ final class ImageComponent extends Component
 
     protected function getParameters() : array|object
     {
-        $this->assetID = $this->attributes->get( 'asset-id' );
+        $assetID = $this->attributes->get( 'asset-id' );
+        $image   = $this->assetManager->getImage( $this->src, $assetID );
 
         $this->attributes->class->add( 'image', prepend : true );
         $this->attributes->class->add( $this->type );
 
-        $image = $this->assetManager->getImage( $this->source, $this->assetID );
-
         $this->blurhash = new Blurhash( $image );
         $this->sources  = new Sources( $image );
         $this->image    = new Image( $image, $this->alt );
+        $this->aspect   = $image->aspect;
 
-        $this->attributes->add( 'asset-id', $image->assetID );
+        $this->attributes->add( 'asset-id', $assetID );
 
         return parent::getParameters();
     }
