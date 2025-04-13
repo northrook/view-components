@@ -22,8 +22,6 @@ final class ImageComponent extends Component
 
     public ?string $type = 'image';
 
-    public readonly ?string $assetID;
-
     public readonly Blurhash $blurhash;
 
     public readonly Sources $sources;
@@ -73,8 +71,7 @@ final class ImageComponent extends Component
 
     protected function getParameters() : array|object
     {
-        $assetID = $this->attributes->get( 'asset-id' );
-        $image   = $this->assetManager->getImage( $this->src, $assetID );
+        $image = $this->assetManager->getImage( $this->src, $this->attributes->get( 'asset-id' ) );
 
         $this->attributes->class->add( ['image', $this->type], true );
 
@@ -83,7 +80,7 @@ final class ImageComponent extends Component
         $this->image    = new Image( $image, $this->alt );
         $this->aspect   = $image->aspect;
 
-        $this->attributes->set( asset_id : $assetID );
+        $this->attributes->set( 'asset-id', $image->assetID );
 
         return parent::getParameters();
     }

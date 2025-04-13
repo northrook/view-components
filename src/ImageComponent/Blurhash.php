@@ -43,16 +43,15 @@ final class Blurhash extends Element
 
     public function __toString() : string
     {
-        $blurhash = new Element( 'blurhash', null, ...$this->attributes );
-        $blurhash->attributes->style->add(
+        $this->attributes->style->add(
             "background-image: url({$this->asset->getBlurHashDataUri( $this->resolution )}); background-size: cover;",
         );
         if ( $this->aspectRatio ) {
-            $blurhash->attributes->style->add(
+            $this->attributes->style->add(
                 "aspect-ratio: {$this->asset->aspect->getFloat()};",
             );
         }
 
-        return $blurhash->__toString();
+        return $this->render();
     }
 }
