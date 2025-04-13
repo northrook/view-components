@@ -3,18 +3,18 @@
 namespace Core\View\ImageComponent;
 
 use Core\Asset\ImageAsset;
+use Core\Interface\View;
 use Core\View\Element;
-use Core\View\Template\Runtime\Html;
 
 /**
  * @internal
  */
-final class Sources extends Html
+final class Sources extends View
 {
-    public function __construct( private readonly ImageAsset $asset )
-    {
-        parent::__construct();
-    }
+    /** @var Element[] */
+    private array $source = [];
+
+    public function __construct( private readonly ImageAsset $asset ) {}
 
     /**
      * @return $this
@@ -27,14 +27,12 @@ final class Sources extends Html
     public function __toString() : string
     {
         foreach ( $this->asset->getSrcset() as $image ) {
-            $this->addValue(
-                Element::source(
-                    srcset : $image['assetUrl'],
-                    media  : "(min-width: {$image['width']}px)",
-                ),
+            $this->source[] = Element::source(
+                srcset : $image['assetUrl'],
+                media  : "(min-width: {$image['width']}px)",
             );
         }
 
-        return parent::__toString();
+        return \implode( '', $this->source );
     }
 }

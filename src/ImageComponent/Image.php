@@ -3,28 +3,29 @@
 namespace Core\View\ImageComponent;
 
 use Core\Asset\ImageAsset;
+use Core\Interface\View;
 use Core\View\Element;
-use Core\View\Template\Runtime\Html;
 
 /**
  * @internal
  */
-final class Image extends Html
+final class Image extends View
 {
     public function __construct(
         private readonly ImageAsset $asset,
         protected string            $alt,
-    ) {
-        parent::__construct();
-    }
+    ) {}
 
     /**
-     * @param string $alt
+     * @param string                                $alt
+     * @param null|array<array-key, ?string>|scalar ...$attributes
      *
      * @return $this
      */
-    public function __invoke( string $alt ) : self
-    {
+    public function __invoke(
+        string                              $alt,
+        array|bool|string|int|float|null ...$attributes,
+    ) : self {
         $this->alt = $alt;
         return $this;
     }

@@ -76,15 +76,14 @@ final class ImageComponent extends Component
         $assetID = $this->attributes->get( 'asset-id' );
         $image   = $this->assetManager->getImage( $this->src, $assetID );
 
-        $this->attributes->class->add( 'image', prepend : true );
-        $this->attributes->class->add( $this->type );
+        $this->attributes->class->add( ['image', $this->type], true );
 
         $this->blurhash = new Blurhash( $image );
         $this->sources  = new Sources( $image );
         $this->image    = new Image( $image, $this->alt );
         $this->aspect   = $image->aspect;
 
-        $this->attributes->add( 'asset-id', $assetID );
+        $this->attributes->set( asset_id : $assetID );
 
         return parent::getParameters();
     }
