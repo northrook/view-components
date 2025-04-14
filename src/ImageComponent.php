@@ -56,17 +56,21 @@ final class ImageComponent extends Component
     }
 
     protected function prepareArguments(
-        array & $properties,
-        array & $attributes,
-        array & $actions,
-        array & $content,
+        array &   $properties,
+        array &   $attributes,
+        array &   $actions,
+        ?string & $content,
     ) : void {
         $properties['src']     = $attributes['src']     ?? $this::FALLBACK;
         $properties['alt']     = $attributes['alt']     ?? '';
         $properties['caption'] = $attributes['caption'] ?? null;
         $properties['credit']  = $attributes['credit']  ?? null;
 
-        unset( $attributes['src'], $attributes['alt'], $attributes['caption'], $attributes['credit'] );
+        unset(
+
+            $properties['tag'],
+            $attributes['src'], $attributes['alt'], $attributes['caption'], $attributes['credit'],
+        );
     }
 
     protected function getParameters() : array|object

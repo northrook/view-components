@@ -4,8 +4,12 @@ declare(strict_types=1);
 
 namespace Core\View;
 
+use Core\Interface\View;
 use Core\View\ComponentFactory\ViewComponent;
 use Core\View\Template\Component;
+use Core\View\Template\Runtime\Html;
+use Support\Highlight;
+use function Support\str_replace_each;
 use const Support\AUTO;
 
 #[ViewComponent( ['pre', 'code', 'pre:{language}', 'code:{language}:{block}'] )]
@@ -19,7 +23,9 @@ final class CodeComponent extends Component
 
     protected ?int $gutter = null;
 
-    protected string $code;
+    public string $tag;
+
+    public ?View $code = null;
 
     /**
      * @param string  $code
@@ -41,107 +47,85 @@ final class CodeComponent extends Component
         return $this;
     }
 
-    // public function getView() : Element
-    // {
-    //     $this->code = $this->innerContent->getString();
-    //     // dump( $this );
-    //
-    //     // if ( !$this->code ) {
-    //     //     throw new InvalidArgumentException( $this::class . " was provided an empty 'code' property." );
-    //     // }
-    //
-    //     if ( $this->view->tag->is( 'pre' ) ) {
-    //         $this->block = true;
-    //     }
-    //
-    //     return $this::view(
-    //             code       : $this->code,
-    //             block      : $this->block,
-    //             language   : $this->language,
-    //             tidy       : $this->tidy,
-    //             attributes : $this->view->attributes,
-    //     );
-    // }
-    //
-    // /**
-    //  * @param string                                                              $code
-    //  * @param bool                                                                $block      [false] Inline `<code>` by default
-    //  * @param null|false|Language|string                                          $language
-    //  * @param null|int                                                            $gutter
-    //  * @param bool                                                                $tidy
-    //  * @param array<string, null|array<array-key, string>|bool|string>|Attributes $attributes
-    //  *
-    //  * @return Element
-    //  */
-    // public static function view(
-    //         string                     $code,
-    //         bool                       $block = false,
-    //         false|null|string|Language $language = AUTO,
-    //         ?int                       $gutter = null,
-    //         bool                       $tidy = false,
-    //         array|Attributes           $attributes = [],
-    // ) : Element {
-    //     $view = new Element(
-    //             $block ? 'pre' : 'code',
-    //             null,
-    //             $attributes,
-    //     );
-    //
-    //     $code = $block ? self::codeBlock( $code ) : self::codeInline( $code );
-    //
-    //     if ( $tidy ) {
-    //         $code = (string) str_replace_each( [' ), );' => ' ) );'], $code );
-    //     }
-    //
-    //     if ( $language !== false ) {
-    //         $highlight = new Highlight( $code, $language, $gutter );
-    //         $lines     = \substr_count( $code, PHP_EOL );
-    //         if ( $lines ) {
-    //             $view->attributes->add( 'code-lines', $lines + 1 );
-    //         }
-    //         $view->attributes->add( 'code-language', $highlight->language->getName() );
-    //         $code = $highlight->__toString();
-    //     }
-    //
-    //     $view->content( $code );
-    //
-    //     return $view;
-    // }
-    //
-    // final protected static function codeInline( string|Stringable $code ) : string
-    // {
-    //     return (string) \preg_replace( '#\s+#', ' ', (string) $code );
-    // }
-    //
-    // final protected static function codeBlock( string|Stringable $code ) : string
-    // {
-    //     $leftPadding = [];
-    //     $lines       = \explode( "\n", (string) $code );
-    //
-    //     // dump( $lines );
-    //
-    //     foreach ( $lines as $line ) {
-    //         $line = \str_replace( "\t", '    ', $line );
-    //         if ( \preg_match( '#^(\s+)#m', $line, $matches ) ) {
-    //             $leftPadding[] = \strlen( $matches[0] );
-    //         }
-    //     }
-    //
-    //     $trimSpaces = $leftPadding ? \min( $leftPadding ) : 0;
-    //     // dump( $leftPadding, $trimSpaces );
-    //
-    //     foreach ( $lines as $line => $string ) {
-    //         if ( \str_starts_with( $string, \str_repeat( ' ', $trimSpaces ) ) ) {
-    //             $string = \substr( $string, $trimSpaces );
-    //         }
-    //
-    //         \preg_match( '#^(\s*)#m', $string, $matches );
-    //         $leftPad = \strlen( $matches[0] ?? '' );
-    //         $string  = \str_repeat( ' ', $leftPad ).\trim( $string );
-    //         // :: Handled by Str::normalize
-    //         $lines[$line] = \str_replace( '    ', "\t", $string );
-    //     }
-    //
-    //     return \implode( "\n", $lines );
-    // }
+    protected function onCreation( ?string &$content ) : void
+    {
+        if ( ! $content ) {
+            $this->logger?->warning( 'No code content provided.' );
+            return;
+        }
+
+        $code = $this->block ? self::codeBlock( $content ) : self::codeInline( $content );
+
+        if ( $this->tidy ) {
+            $code = (string) str_replace_each( [' ), );' => ' ) );'], $code );
+        }
+
+        if ( $this->language !== false ) {
+            $highlight = new Highlight( $code, $this->language, $this->gutter );
+            $lines     = \substr_count( $code, PHP_EOL );
+            if ( $lines ) {
+                $this->attributes->set( 'code-lines', $lines + 1 );
+            }
+            $this->attributes->set( 'code-language', $highlight->language->getName() );
+            $code = $highlight;
+        }
+
+        $this->code = new Html( $code );
+    }
+
+    protected function prepareArguments(
+        array &   $properties,
+        array &   $attributes,
+        array &   $actions,
+        ?string & $content,
+    ) : void {
+        $tag = $attributes['tag'] ?? 'code';
+
+        $properties['language'] ??= $attributes['lang'] ?? null;
+        $properties['block']    ??= $tag === 'pre';
+
+        $content = $content ? ( \trim( $content ) ?: null ) : null;
+    }
+
+    protected function getParameters() : array|object
+    {
+        return parent::getParameters();
+    }
+
+    final protected function codeInline( string $string ) : string
+    {
+        return (string) \preg_replace( '#\s+#', ' ', $string );
+    }
+
+    final protected static function codeBlock( string $string ) : string
+    {
+        $leftPadding = [];
+        $lines       = \explode( "\n", $string );
+
+        // dump( $lines );
+
+        foreach ( $lines as $line ) {
+            $line = \str_replace( "\t", '    ', $line );
+            if ( \preg_match( '#^(\s+)#m', $line, $matches ) ) {
+                $leftPadding[] = \strlen( $matches[0] );
+            }
+        }
+
+        $trimSpaces = $leftPadding ? \min( $leftPadding ) : 0;
+        // dump( $leftPadding, $trimSpaces );
+
+        foreach ( $lines as $line => $string ) {
+            if ( \str_starts_with( $string, \str_repeat( ' ', $trimSpaces ) ) ) {
+                $string = \substr( $string, $trimSpaces );
+            }
+
+            \preg_match( '#^(\s*)#m', $string, $matches );
+            $leftPad = \strlen( $matches[0] ?? '' );
+            $string  = \str_repeat( ' ', $leftPad ).\trim( $string );
+            // :: Handled by Str::normalize
+            $lines[$line] = \str_replace( '    ', "\t", $string );
+        }
+
+        return \implode( "\n", $lines );
+    }
 }

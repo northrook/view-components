@@ -33,6 +33,15 @@ final class IconComponent extends Component
         return $this;
     }
 
+    protected function prepareArguments(
+        array &   $properties,
+        array &   $attributes,
+        array &   $actions,
+        ?string & $content,
+    ) : void {
+        unset( $properties['tag'] );
+    }
+
     protected function getParameters() : object|array
     {
         if ( ! $this->icon ) {
