@@ -1,12 +1,12 @@
 {templateType Core\View\ImageComponent}
 <figure {$attributes}>
-    <icon:success class="figure image" />
     <picture style="aspect-ratio: {$aspect->getFloat()}">
         {$blurhash( class: 'test hash', style: 'outline: 1px solid deeppink;' )}
         {$sources}
         {$image}
     </picture>
     <cite class="credit" n:ifcontent>
+        {icon 'chevron:right', class: 'tagged icon'}
         {$credit}
     </cite>
     <figcaption n:ifcontent>

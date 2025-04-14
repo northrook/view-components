@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace Core\View;
 
-use Core\Interface\IconProviderInterface;
 use Core\View\ComponentFactory\ViewComponent;
 use Core\View\Template\Component;
-use Core\View\Template\Runtime\Html;
 use InvalidArgumentException;
 
 #[ViewComponent( 'svg:{icon}' )]
@@ -15,19 +13,17 @@ final class SvgComponent extends Component
 {
     protected string $icon;
 
-    protected string $fallback = '';
-
-    public function __construct( private readonly IconProviderInterface $iconProvider ) {}
+    public function __construct( private readonly IconProviderService $iconProvider ) {}
 
     /**
-     * @param string  $get
-     * @param ?string $fallback
+     * @param string $get
+     * @param mixed  ...$attributes
      *
      * @return $this
      */
     public function __invoke(
-        string  $get,
-        ?string $fallback = null,
+        string   $get,
+        mixed ...$attributes,
     ) : self {
         dump( \get_defined_vars() );
         return $this;
@@ -40,17 +36,9 @@ final class SvgComponent extends Component
             throw new InvalidArgumentException( 'No icon key provided.' );
         }
 
-        $icon = $this->iconProvider->get( $this->icon, $this->fallback, ...$this->attributes->array );
+        $icon = $this->iconProvider->getSvg( $this->icon, ...$this->attributes->array );
 
-        \assert( $icon instanceof Icon );
-
-        if ( ! $icon->isValid ) {
-            $this->logger?->error(
-                $this::class.': No valid icon provided.',
-                ['icon' => $icon, 'get' => $this->icon],
-            );
-            $icon = new Html( '' );
-        }
+        \assert( $icon instanceof Element );
 
         return (string) $icon;
     }

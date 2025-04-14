@@ -4,12 +4,9 @@ declare(strict_types=1);
 
 namespace Core\View;
 
-use Core\Interface\IconProviderInterface;
 use Core\View\ComponentFactory\ViewComponent;
 use Core\View\Template\Component;
-use Core\View\Template\Runtime\Html;
 use InvalidArgumentException;
-use Stringable;
 
 #[ViewComponent( 'icon:{icon}:{size}' )]
 final class IconComponent extends Component
@@ -18,21 +15,19 @@ final class IconComponent extends Component
 
     protected ?int $size;
 
-    protected string $fallback = '';
+    public Element $svg;
 
-    public Stringable $svg;
-
-    public function __construct( private readonly IconProviderInterface $iconProvider ) {}
+    public function __construct( private readonly IconProviderService $iconProvider ) {}
 
     /**
-     * @param string  $get
-     * @param ?string $fallback
+     * @param string $get
+     * @param mixed  ...$attributes
      *
      * @return $this
      */
     public function __invoke(
-        string  $get,
-        ?string $fallback = null,
+        string   $get,
+        mixed ...$attributes,
     ) : self {
         dump( \get_defined_vars() );
         return $this;
@@ -45,23 +40,16 @@ final class IconComponent extends Component
             throw new InvalidArgumentException( 'No icon key provided.' );
         }
 
-        $icon = $this->iconProvider->get( $this->icon, $this->fallback );
+        $icon = $this->iconProvider->getSvg( $this->icon, ...$this->attributes->array );
 
-        \assert( $icon instanceof Icon );
+        \assert( $icon instanceof Element );
 
         if ( $this->size ) {
             // TODO : Add $icon->attributes() to Icon::class
         }
 
-        if ( ! $icon->isValid ) {
-            $this->logger?->error(
-                $this::class.': No valid icon provided.',
-                ['icon' => $icon, 'get' => $this->icon],
-            );
-            $icon = new Html( '' );
-        }
-
         $this->svg = $icon;
+
         return parent::getParameters();
     }
 }
