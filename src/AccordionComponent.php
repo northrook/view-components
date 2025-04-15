@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Core\View;
 
 use Core\View\Element\{Attributes, Content, Tag};
-use Core\View\Template\{Component};
 use Core\View\ComponentFactory\ViewComponent;
 use function Support\slug;
 

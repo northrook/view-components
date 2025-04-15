@@ -7,7 +7,6 @@ namespace Core\View;
 use Core\AssetManager;
 use Core\View\ComponentFactory\ViewComponent;
 use Core\View\ImageComponent\{Blurhash, Image, Sources};
-use Core\View\Template\Component;
 use Support\Image\Aspect;
 use Stringable;
 

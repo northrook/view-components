@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Core\View;
 
 use Core\View\ComponentFactory\ViewComponent;
-use Core\View\Template\Component;
 
 #[ViewComponent( 'input:{type}' )]
 final class InputComponent extends Component

@@ -6,7 +6,6 @@ namespace Core\View;
 
 use Core\Interface\View;
 use Core\View\ComponentFactory\ViewComponent;
-use Core\View\Template\Component;
 use Core\View\Template\Runtime\Html;
 use Support\Highlight;
 use function Support\str_replace_each;
