@@ -48,6 +48,8 @@ final class CodeComponent extends Component
 
     protected function onCreation( ?string &$content ) : void
     {
+        $content = $content ? ( \trim( $content ) ?: null ) : null;
+
         if ( ! $content ) {
             $this->logger?->warning( 'No code content provided.' );
             return;
@@ -73,17 +75,14 @@ final class CodeComponent extends Component
     }
 
     protected function prepareArguments(
-        array &   $properties,
-        array &   $attributes,
-        array &   $actions,
-        ?string & $content,
+        array & $properties,
+        array & $attributes,
+        array & $actions,
+        array & $content,
     ) : void {
-        $tag = $attributes['tag'] ?? 'code';
-
         $properties['language'] ??= $attributes['lang'] ?? null;
-        $properties['block']    ??= $tag === 'pre';
 
-        $content = $content ? ( \trim( $content ) ?: null ) : null;
+        $properties['block'] ??= $this->tag === 'pre';
     }
 
     protected function getParameters() : array|object

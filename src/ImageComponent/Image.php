@@ -1,46 +1,55 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Core\View\ImageComponent;
 
 use Core\Asset\ImageAsset;
-use Core\Interface\View;
 use Core\View\Element;
+use const Support\AUTO;
 
 /**
  * @internal
  */
-final class Image extends View
+final class Image extends Element
 {
+    /**
+     * @param ImageAsset          $asset
+     * @param string              $alt
+     * @param null|'eager'|'lazy' $load
+     */
     public function __construct(
         private readonly ImageAsset $asset,
-        protected string            $alt,
-    ) {}
+        string                      $alt,
+        ?string                     $load = AUTO,
+    ) {
+        \assert( $load === AUTO || $load === 'eager' || $load === 'lazy' );
+        parent::__construct( 'img', alt : $alt, data_load : $load );
+    }
 
     /**
-     * @param string                                $alt
-     * @param null|array<array-key, ?string>|scalar ...$attributes
+     * @param mixed ...$attributes
      *
      * @return $this
      */
-    public function __invoke(
-        string                              $alt,
-        array|bool|string|int|float|null ...$attributes,
-    ) : self {
-        $this->alt = $alt;
+    public function __invoke( mixed ...$attributes ) : self
+    {
+        $this->attributes->merge( ...$attributes );
         return $this;
     }
 
     public function __toString() : string
     {
-        return Element::img(
-            $this->asset->getFallbackSource(),
-            $this->alt,
-            asset_id : $this->asset->assetID,
-            style    : [
-                'width'        => '100%',
-                'height'       => 'auto',
-                'aspect-ratio' => $this->asset->aspect->getFloat(),
-            ],
-        );
+        $this->attributes
+            ->set( 'asset-id', $this->asset->assetID )
+            ->set( 'src', $this->asset->getFallbackSource() )
+            ->set( 'decoding', 'async' )
+            ->style(
+                width        : '100%',
+                height       : 'auto',
+                aspect_ratio : $this->asset->aspect->getFloat(),
+            );
+
+        return $this->render();
     }
 }

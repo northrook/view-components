@@ -33,10 +33,10 @@ final class IconComponent extends Component
     }
 
     protected function prepareArguments(
-        array &   $properties,
-        array &   $attributes,
-        array &   $actions,
-        ?string & $content,
+        array & $properties,
+        array & $attributes,
+        array & $actions,
+        array & $content,
     ) : void {
         unset( $properties['tag'] );
     }

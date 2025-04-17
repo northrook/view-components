@@ -55,10 +55,10 @@ final class ImageComponent extends Component
     }
 
     protected function prepareArguments(
-        array &   $properties,
-        array &   $attributes,
-        array &   $actions,
-        ?string & $content,
+        array & $properties,
+        array & $attributes,
+        array & $actions,
+        array & $content,
     ) : void {
         $properties['src']     = $attributes['src']     ?? $this::FALLBACK;
         $properties['alt']     = $attributes['alt']     ?? '';
@@ -75,8 +75,7 @@ final class ImageComponent extends Component
     protected function getParameters() : array|object
     {
         $image = $this->assetManager->getImage( $this->src, $this->attributes->get( 'asset-id' ) );
-
-        $this->attributes->class->add( ['image', $this->type], true );
+        $load  = $this->{$this}->attributes->class->add( ['image', $this->type], true );
 
         $this->blurhash = new Blurhash( $image );
         $this->sources  = new Sources( $image );
