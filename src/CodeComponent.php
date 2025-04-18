@@ -85,11 +85,6 @@ final class CodeComponent extends Component
         $properties['block'] ??= $this->tag === 'pre';
     }
 
-    protected function getParameters() : array|object
-    {
-        return parent::getParameters();
-    }
-
     final protected function codeInline( string $string ) : string
     {
         return (string) \preg_replace( '#\s+#', ' ', $string );
