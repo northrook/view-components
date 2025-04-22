@@ -6,58 +6,35 @@ namespace Core\View;
 
 use Core\View\ComponentFactory\ViewComponent;
 use InvalidArgumentException;
+use RuntimeException;
 
-#[ViewComponent( 'icon:{icon}:{size}' )]
+#[ViewComponent( 'icon:{get}:{size}' )]
 final class IconComponent extends Component
 {
-    protected string $icon;
-
-    protected ?int $size;
-
     public Element $svg;
 
     public function __construct( private readonly IconProviderService $iconProvider ) {}
 
     /**
      * @param string $get
+     * @param ?int   $size
      * @param mixed  ...$attributes
      *
      * @return $this
      */
     public function __invoke(
-        string   $get,
+        ?string  $get = null,
+        ?int     $size = null,
         mixed ...$attributes,
     ) : self {
-        dump( \get_defined_vars() );
-        return $this;
-    }
-
-    protected function prepareArguments(
-        array & $properties,
-        array & $attributes,
-        array & $actions,
-        array & $content,
-    ) : void {
-        unset( $properties['tag'] );
-    }
-
-    protected function getParameters() : object|array
-    {
-        if ( ! $this->icon ) {
+        if ( ! $get ) {
             $this->logger?->error( $this::class.': No icon key provided.' );
             throw new InvalidArgumentException( 'No icon key provided.' );
         }
+        $this->svg = $this->iconProvider->getSvg( $get, ...$attributes )
+                     ?? throw new RuntimeException( 'No icon found.' );
 
-        $icon = $this->iconProvider->getSvg( $this->icon, ...$this->attributes->array );
-
-        \assert( $icon instanceof Element );
-
-        if ( $this->size ) {
-            // TODO : Add $icon->attributes() to Icon::class
-        }
-
-        $this->svg = $icon;
-
-        return parent::getParameters();
+        dump( [__METHOD__ => $this, ...\get_defined_vars()] );
+        return $this;
     }
 }

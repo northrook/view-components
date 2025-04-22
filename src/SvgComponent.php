@@ -6,11 +6,12 @@ namespace Core\View;
 
 use Core\View\ComponentFactory\ViewComponent;
 use InvalidArgumentException;
+use RuntimeException;
 
-#[ViewComponent( 'svg:{icon}' )]
+#[ViewComponent( 'svg:{get}' )]
 final class SvgComponent extends Component
 {
-    protected string $icon;
+    public readonly Element $svg;
 
     public function __construct( private readonly IconProviderService $iconProvider ) {}
 
@@ -21,24 +22,24 @@ final class SvgComponent extends Component
      * @return $this
      */
     public function __invoke(
-        string   $get,
+        ?string  $get = null,
         mixed ...$attributes,
     ) : self {
-        dump( \get_defined_vars() );
+        if ( ! $get ) {
+            $this->logger?->error( $this::class.': No icon key provided.' );
+            throw new InvalidArgumentException( 'No icon key provided.' );
+        }
+        $this->svg = $this->iconProvider->getSvg( $get, ...$attributes )
+                     ?? throw new RuntimeException( 'No icon found.' );
+
+        dump( [__METHOD__ => $this, ...\get_defined_vars()] );
         return $this;
     }
 
     public function getString() : string
     {
-        if ( ! $this->icon ) {
-            $this->logger?->error( $this::class.': No icon key provided.' );
-            throw new InvalidArgumentException( 'No icon key provided.' );
-        }
+        $this->svg->attributes->merge( $this->attributes->array );
 
-        $icon = $this->iconProvider->getSvg( $this->icon, ...$this->attributes->array );
-
-        \assert( $icon instanceof Element );
-
-        return (string) $icon;
+        return $this->svg->render();
     }
 }

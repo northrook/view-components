@@ -8,7 +8,7 @@ class ListItem extends ViewElement
 {
     protected ?ViewElement $parent = null;
 
-    /** @var ViewElement */
+    /** @var ViewElement[] */
     protected array $children = [];
 
     protected ?string $icon;

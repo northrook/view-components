@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Core\View;
 
 use Core\AssetManager;
+use Core\View\Component\Arguments;
 use Core\View\ComponentFactory\ViewComponent;
 use Core\View\ImageComponent\{Blurhash, Image, Sources};
 use Support\Image\Aspect;
@@ -49,33 +50,9 @@ final class ImageComponent extends Component
         ?string $caption = null,
         ?string $credit = null,
     ) : self {
-        return $this->create(
-            ['src' => $src, 'alt' => $alt, 'caption' => $caption, 'credit' => $credit],
-        );
-    }
-
-    protected function prepareArguments(
-        array & $properties,
-        array & $attributes,
-        array & $actions,
-        array & $content,
-    ) : void {
-        $properties['src']     = $attributes['src']     ?? $this::FALLBACK;
-        $properties['alt']     = $attributes['alt']     ?? '';
-        $properties['caption'] = $attributes['caption'] ?? null;
-        $properties['credit']  = $attributes['credit']  ?? null;
-
-        unset(
-
-            $properties['tag'],
-            $attributes['src'], $attributes['alt'], $attributes['caption'], $attributes['credit'],
-        );
-    }
-
-    protected function getParameters() : array|object
-    {
         $image = $this->assetManager->getImage( $this->src, $this->attributes->get( 'asset-id' ) );
-        $load  = $this->{$this}->attributes->class->add( ['image', $this->type], true );
+
+        $this->attributes->class->add( ['image', $this->type], true );
 
         $this->blurhash = new Blurhash( $image );
         $this->sources  = new Sources( $image );
@@ -84,6 +61,17 @@ final class ImageComponent extends Component
 
         $this->attributes->set( 'asset-id', $image->assetID );
 
-        return parent::getParameters();
+        return $this;
+    }
+
+    public static function prepareArguments( Arguments $arguments ) : void
+    {
+        $arguments
+            ->add( 'src', $arguments->attributes->pull( 'src' ) ?? self::FALLBACK )
+            ->add( 'alt', $arguments->attributes->pull( 'alt' ) ?? '' )
+            ->add( 'caption', $arguments->attributes->pull( 'caption' ) ?? null )
+            ->add( 'credit', $arguments->attributes->pull( 'credit' ) ?? null );
+
+        dump( $arguments );
     }
 }
