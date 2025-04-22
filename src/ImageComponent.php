@@ -41,6 +41,7 @@ final class ImageComponent extends Component
      * @param string  $alt
      * @param ?string $caption
      * @param ?string $credit
+     * @param string  $type
      *
      * @return $this
      */
@@ -49,8 +50,9 @@ final class ImageComponent extends Component
         string  $alt = '',
         ?string $caption = null,
         ?string $credit = null,
+        string  $type = 'image',
     ) : self {
-        $image = $this->assetManager->getImage( $this->src, $this->attributes->get( 'asset-id' ) );
+        $image = $this->assetManager->getImage( $src, $this->attributes->get( 'asset-id' ) );
 
         $this->attributes->class->add( ['image', $this->type], true );
 
@@ -58,6 +60,8 @@ final class ImageComponent extends Component
         $this->sources  = new Sources( $image );
         $this->image    = new Image( $image, $this->alt );
         $this->aspect   = $image->aspect;
+        $this->caption  = $caption;
+        $this->credit   = $credit;
 
         $this->attributes->set( 'asset-id', $image->assetID );
 
