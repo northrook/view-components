@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Core\View;
 
-use Core\Interface\View;
 use Core\View\Component\Arguments;
 use Core\View\ComponentFactory\ViewComponent;
 use Core\View\Template\Runtime\Html;
@@ -15,23 +14,25 @@ use const Support\AUTO;
 #[ViewComponent( ['pre', 'code', 'pre:{language}', 'code:{language}:{block}'] )]
 final class CodeComponent extends Component
 {
-    protected bool $tidy = false;
-
-    protected null|string|false $language = null;
-
-    protected ?bool $block = false;
-
-    protected ?int $gutter = null;
-
     public string $tag;
 
-    public ?View $code = null;
+    public readonly null|string|false $language;
+
+    public readonly ?Html $code;
+
+    public static function prepareArguments( Arguments $arguments ) : void
+    {
+        $arguments
+            ->add( 'code', $arguments->node->content )
+            ->add( 'language', $arguments->attributes->pull( 'lang' ) ?? null )
+            ->add( 'block', $arguments->node->name === 'pre' );
+    }
 
     /**
      * @param string  $code
      * @param ?string $language
      * @param bool    $block
-     * @param ?int    $gutter
+     * @param ?int    $gutter   Show a line number gutter starting from [int]
      * @param bool    $tidy
      *
      * @return $this
@@ -43,36 +44,34 @@ final class CodeComponent extends Component
         ?int    $gutter = null,
         bool    $tidy = false,
     ) : self {
-        dump( \get_defined_vars() );
+        $this->tag      = $block ? 'pre' : 'code';
+        $this->language = $this->codeLanguage( $language );
+        $this->code     = $this->highlightHtml( $code, $block, $gutter, $tidy );
         return $this;
     }
 
-    public static function prepareArguments( Arguments $arguments ) : void
-    {
-        $arguments
-            ->add( 'language', $arguments->attributes->pull( 'lang' ) ?? null )
-            ->add( 'block', $arguments->node->name === 'pre' );
+    private function highlightHtml(
+        string $code,
+        bool   $block,
+        ?int   $gutter,
+        bool   $tidy,
+    ) : ?Html {
+        $code = \trim( $code );
 
-        dump( $arguments );
-    }
-
-    protected function onCreation( ?string &$content ) : void
-    {
-        $content = $content ? ( \trim( $content ) ?: null ) : null;
-
-        if ( ! $content ) {
+        if ( ! $code ) {
             $this->logger?->warning( 'No code content provided.' );
-            return;
+            return null;
         }
 
-        $code = $this->block ? self::codeBlock( $content ) : self::codeInline( $content );
+        $code = $block ? self::codeBlock( $code ) : self::codeInline( $code );
+        dump( \get_defined_vars() );
 
-        if ( $this->tidy ) {
+        if ( $tidy ) {
             $code = (string) str_replace_each( [' ), );' => ' ) );'], $code );
         }
 
         if ( $this->language !== false ) {
-            $highlight = new Highlight( $code, $this->language, $this->gutter );
+            $highlight = new Highlight( $code, $this->language, $gutter );
             $lines     = \substr_count( $code, PHP_EOL );
             if ( $lines ) {
                 $this->attributes->set( 'code-lines', $lines + 1 );
@@ -81,7 +80,15 @@ final class CodeComponent extends Component
             $code = $highlight;
         }
 
-        $this->code = new Html( $code );
+        return new Html( $code );
+    }
+
+    private function codeLanguage( ?string $language ) : null|string|false
+    {
+        if ( $language === 'NONE' ) {
+            return false;
+        }
+        return $language;
     }
 
     final protected function codeInline( string $string ) : string
