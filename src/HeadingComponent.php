@@ -17,6 +17,9 @@ use Core\View\Component\Arguments;
 use Core\View\ComponentFactory\ViewComponent;
 
 use Core\View\Element\Heading;
+use Core\View\Html\HtmlFormatter;
+use Core\View\Template\Compiler\{Node};
+use InvalidArgumentException;
 use const Support\{AUTO, TAG_HEADING};
 
 /**
@@ -52,10 +55,44 @@ use const Support\{AUTO, TAG_HEADING};
 #[ViewComponent( TAG_HEADING )]
 final class HeadingComponent extends Component
 {
-    public readonly Heading $heading;
+    public readonly Element $heading;
+
+    public static function prepareArguments( Arguments $arguments ) : void
+    {
+        $level = null;
+        if ( $arguments->node->name === 'hgroup' ) {
+            foreach ( $arguments->node->content as $node ) {
+                if ( $level ) {
+                    throw new InvalidArgumentException( 'Heading level cannot be defined more than once.' );
+                }
+
+                if ( \in_array(
+                    $node->node->name,
+                    ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
+                ) ) {
+                    $level ??= (int) $node->node->name[1];
+                }
+            }
+        }
+        elseif ( \in_array(
+            $arguments->node->name,
+            ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
+        ) ) {
+            $level = (int) $arguments->node->name[1];
+        }
+        else {
+            throw new InvalidArgumentException( 'Unable to determine heading level.' );
+        }
+
+        $arguments
+            ->add( 'heading', $arguments->node->content )
+            ->add( 'level', $level );
+        // ->add( 'language', $arguments->attributes->pull( 'lang' ) ?? null )
+        // ->add( 'block', $arguments->node->name === 'pre' );
+    }
 
     /**
-     * @param null|string          $heading
+     * @param string               $heading
      * @param null|string          $subheading
      * @param int                  $level
      * @param null|bool            $subheadingFirst
@@ -71,19 +108,19 @@ final class HeadingComponent extends Component
         ?bool   $subheadingFirst = AUTO,
         string  $type = Heading::TYPE_GROUP,
     ) : self {
-        $this->heading = new Heading(
-            $heading,
-            $subheading,
-            $level,
-            $subheadingFirst,
-            $type,
-        );
-        return $this;
-    }
+        if ( $subheading === AUTO ) {
+            $html          = new HtmlFormatter( null );
+            $ast           = $html->htmlToAst( $heading, true );
+            $this->heading = new Element( "h{$level}", $html->astToHtml( $ast ), ...$this->attributes->array );
+        }
+        else {
+            $this->heading = new Heading( $heading, $subheading, $level, $subheadingFirst, $type );
+        }
 
-    public static function prepareArguments( Arguments $arguments ) : void
-    {
-        dump( $arguments );
+        // : If $subheading is provided, treat $heading as given
+        // . Else, parse $heading, generating $content
+
+        return $this;
     }
 
     protected function getString() : string

@@ -16,7 +16,7 @@ final class CodeComponent extends Component
 {
     public string $tag;
 
-    public readonly null|string|false $language;
+    public readonly ?string $language;
 
     public readonly ?Html $code;
 
@@ -44,51 +44,48 @@ final class CodeComponent extends Component
         ?int    $gutter = null,
         bool    $tidy = false,
     ) : self {
-        $this->tag      = $block ? 'pre' : 'code';
-        $this->language = $this->codeLanguage( $language );
-        $this->code     = $this->highlightHtml( $code, $block, $gutter, $tidy );
+        $this->tag                     = $block ? 'pre' : 'code';
+        [$this->language, $this->code] = $this->getCache(
+            $this->uniqueId,
+            fn() => $this->highlightHtml( $code, $language, $block, $gutter, $tidy ),
+        );
+        // $this->language = $this->codeLanguage( $language );
+        // $this->code     = $this->highlightHtml( $code, $block, $gutter, $tidy );
         return $this;
     }
 
     private function highlightHtml(
-        string $code,
-        bool   $block,
-        ?int   $gutter,
-        bool   $tidy,
-    ) : ?Html {
+        string            $code,
+        string|false|null $language,
+        bool              $block,
+        ?int              $gutter,
+        bool              $tidy,
+    ) : array {
         $code = \trim( $code );
 
         if ( ! $code ) {
             $this->logger?->warning( 'No code content provided.' );
-            return null;
+            return [$language, null];
         }
 
         $code = $block ? self::codeBlock( $code ) : self::codeInline( $code );
-        dump( \get_defined_vars() );
 
         if ( $tidy ) {
             $code = (string) str_replace_each( [' ), );' => ' ) );'], $code );
         }
 
-        if ( $this->language !== false ) {
-            $highlight = new Highlight( $code, $this->language, $gutter );
+        if ( $language !== false ) {
+            $highlight = new Highlight( $code, $language, $gutter );
             $lines     = \substr_count( $code, PHP_EOL );
             if ( $lines ) {
                 $this->attributes->set( 'code-lines', $lines + 1 );
             }
             $this->attributes->set( 'code-language', $highlight->language->getName() );
-            $code = $highlight;
+            $code     = $highlight;
+            $language = $highlight->language->getName();
         }
 
-        return new Html( $code );
-    }
-
-    private function codeLanguage( ?string $language ) : null|string|false
-    {
-        if ( $language === 'NONE' ) {
-            return false;
-        }
-        return $language;
+        return [$language ?: null, new Html( $code )];
     }
 
     final protected function codeInline( string $string ) : string

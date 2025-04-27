@@ -33,8 +33,6 @@ final class IconComponent extends Component
         }
         $this->svg = $this->iconProvider->getSvg( $get, ...$attributes )
                      ?? throw new RuntimeException( 'No icon found.' );
-
-        dump( [__METHOD__ => $this, ...\get_defined_vars()] );
         return $this;
     }
 }
