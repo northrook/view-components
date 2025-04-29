@@ -18,6 +18,8 @@
   "prefer-stable": true,
   "require": {
     "php": ">=8.3",
+    "ext-dom": "*",
+    "ext-libxml": "*",
     "northrook/pathfinder": "dev-main",
     "northrook/core-symfony": "dev-main",
     "northrook/view": "dev-main",

@@ -1,6 +1,6 @@
 <?php
 
-declare( strict_types = 1 );
+declare(strict_types=1);
 
 namespace Core\View;
 
@@ -11,7 +11,7 @@ use Core\View\ImageComponent\{Blurhash, Image, Sources};
 use Support\Image\Aspect;
 use Stringable;
 
-#[ViewComponent( [ 'img', 'img:{type}' ] )]
+#[ViewComponent( ['img', 'img:{type}'] )]
 final class ImageComponent extends Component
 {
     protected const string FALLBACK = '';
@@ -30,32 +30,31 @@ final class ImageComponent extends Component
 
     public readonly Aspect $aspect;
 
-    public null | string | Stringable $caption;
+    public null|string|Stringable $caption;
 
-    public null | string | Stringable $credit;
+    public null|string|Stringable $credit;
 
     public function __construct( private readonly AssetManager $assetManager ) {}
 
     /**
-     * @param string   $src
-     * @param string   $alt
-     * @param ?string  $caption
-     * @param ?string  $credit
-     * @param string   $type
+     * @param string  $src
+     * @param string  $alt
+     * @param ?string $caption
+     * @param ?string $credit
+     * @param string  $type
      *
      * @return $this
      */
     public function __invoke(
-            string  $src,
-            string  $alt = '',
-            ?string $caption = null,
-            ?string $credit = null,
-            string  $type = 'image',
-    ) : self
-    {
+        string  $src,
+        string  $alt = '',
+        ?string $caption = null,
+        ?string $credit = null,
+        string  $type = 'image',
+    ) : self {
         $image = $this->assetManager->getImage( $src, $this->attributes->get( 'asset-id' ) );
 
-        $this->attributes->class->add( [ 'image', $this->type ], true );
+        $this->attributes->class->add( ['image', $this->type], true );
 
         $this->blurhash = new Blurhash( $image );
         $this->sources  = new Sources( $image );
@@ -72,9 +71,9 @@ final class ImageComponent extends Component
     public static function prepareArguments( Arguments $arguments ) : void
     {
         $arguments
-                ->add( 'src', $arguments->attributes->pull( 'src' ) ?? self::FALLBACK )
-                ->add( 'alt', $arguments->attributes->pull( 'alt' ) ?? '' )
-                ->add( 'caption', $arguments->attributes->pull( 'caption' ) ?? null )
-                ->add( 'credit', $arguments->attributes->pull( 'credit' ) ?? null );
+            ->add( 'src', $arguments->attributes->pull( 'src' ) ?? self::FALLBACK )
+            ->add( 'alt', $arguments->attributes->pull( 'alt' ) ?? '' )
+            ->add( 'caption', $arguments->attributes->pull( 'caption' ) ?? null )
+            ->add( 'credit', $arguments->attributes->pull( 'credit' ) ?? null );
     }
 }
