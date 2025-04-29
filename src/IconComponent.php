@@ -1,6 +1,6 @@
 <?php
 
-declare( strict_types = 1 );
+declare(strict_types=1);
 
 namespace Core\View;
 
@@ -10,8 +10,8 @@ use InvalidArgumentException;
 use RuntimeException;
 
 #[ViewComponent( [
-        'icon:{name}:{mod}',
-        'svg:{name}:{mod}',
+    'icon:{name}:{mod}', // <i [attr]><svg>..
+    'svg:{name}:{mod}',  // <svg [attr]>..
 ] )]
 final class IconComponent extends Component
 {
@@ -27,20 +27,19 @@ final class IconComponent extends Component
     }
 
     /**
-     * @param string   $name
-     * @param ?string  $mod
-     * @param mixed    ...$attributes
+     * @param string  $name
+     * @param ?string $mod
+     * @param mixed   ...$attributes
      *
      * @return $this
      */
     public function __invoke(
-            ?string $name = null,
-            ?string $mod = null,
-            mixed   ...$attributes,
-    ) : self
-    {
-        if ( !$name ) {
-            $message = $this::class . ': No icon name provided.';
+        ?string  $name = null,
+        ?string  $mod = null,
+        mixed ...$attributes,
+    ) : self {
+        if ( ! $name ) {
+            $message = $this::class.': No icon name provided.';
             $this->logger?->error( $message );
             throw new InvalidArgumentException( $message );
         }
@@ -50,19 +49,19 @@ final class IconComponent extends Component
         }
 
         if ( $this->attributes->merge( ...$attributes )->has( 'size' ) ) {
-            $size                   = $this->attributes->pull( 'size' );
-            $size                   = ( \is_numeric( $size ) && $size > 0 ) ? "{$size}px" : $size;
-            $attributes[ 'width' ]  = $size;
-            $attributes[ 'height' ] = $size;
+            $size                 = $this->attributes->pull( 'size' );
+            $size                 = ( \is_numeric( $size ) && $size > 0 ) ? "{$size}px" : $size;
+            $attributes['width']  = $size;
+            $attributes['height'] = $size;
         }
         $this->svg = $this->iconProvider->getSvg( $name, ...$attributes )
                      ?? throw new RuntimeException(
-                        $this::class . "No icon found for '{$name}'.",
-                );
+                         $this::class."No icon found for '{$name}'.",
+                     );
         return $this;
     }
 
-    protected function getTemplatePath() : false | string
+    protected function getTemplatePath() : false|string
     {
         return $this->_render === 'svg' ? false : $this->name;
     }
