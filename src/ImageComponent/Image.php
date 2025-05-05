@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Core\View\ImageComponent;
 
-use Core\Asset\ImageAsset;
+use Core\Assets\ImageAsset;
 use Core\View\Element;
 use const Support\AUTO;
 
@@ -41,7 +41,7 @@ final class Image extends Element
     public function __toString() : string
     {
         $this->attributes
-            ->set( 'asset-id', $this->asset->assetID )
+            ->set( 'asset-id', $this->asset->getAssetId() )
             ->set( 'src', $this->asset->getFallbackSource() )
             ->set( 'decoding', 'async' )
             ->style(

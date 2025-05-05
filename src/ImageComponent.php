@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Core\View;
 
 use Core\AssetManager;
+use Core\Assets\ImageAsset;
 use Core\View\Component\Arguments;
 use Core\View\ComponentFactory\ViewComponent;
 use Core\View\ImageComponent\{Blurhash, Image, Sources};
@@ -52,7 +53,9 @@ final class ImageComponent extends Component
         ?string $credit = null,
         string  $type = 'image',
     ) : self {
-        $image = $this->assetManager->getImage( $src, $this->attributes->get( 'asset-id' ) );
+        $image = $this->assetManager->getAsset( $src );
+
+        \assert( $image instanceof ImageAsset );
 
         $this->attributes->class->add( ['image', $this->type], true );
 
@@ -63,7 +66,7 @@ final class ImageComponent extends Component
         $this->caption  = $caption;
         $this->credit   = $credit;
 
-        $this->attributes->set( 'asset-id', $image->assetID );
+        $this->attributes->set( 'asset-id', $image->getAssetId() );
 
         return $this;
     }

@@ -2,7 +2,7 @@
 
 namespace Core\View\ImageComponent;
 
-use Core\Asset\ImageAsset;
+use Core\Assets\ImageAsset;
 use Core\Interface\View;
 use Core\View\Element;
 

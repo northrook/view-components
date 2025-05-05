@@ -54,6 +54,15 @@ final class CodeComponent extends Component
         return $this;
     }
 
+    /**
+     * @param string            $code
+     * @param null|false|string $language
+     * @param bool              $block
+     * @param null|int          $gutter
+     * @param bool              $tidy
+     *
+     * @return array{0: ?string, 1: ?Html}
+     */
     private function highlightHtml(
         string            $code,
         string|false|null $language,
@@ -65,7 +74,7 @@ final class CodeComponent extends Component
 
         if ( ! $code ) {
             $this->logger?->warning( 'No code content provided.' );
-            return [$language, null];
+            return [$language ?: null, null];
         }
 
         $code = $block ? self::codeBlock( $code ) : self::codeInline( $code );

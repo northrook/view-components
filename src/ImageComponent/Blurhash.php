@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Core\View\ImageComponent;
 
-use Core\Asset\ImageAsset;
+use Core\Assets\ImageAsset;
 use Core\View\Element;
 use const Support\AUTO;
 
